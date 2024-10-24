@@ -7,7 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="77e3684d-be5c-4b1f-973c-bfbe2a0e02da" name="更改" comment="创建Aura角色和长矛哥布林敌人">
+    <list default="true" id="77e3684d-be5c-4b1f-973c-bfbe2a0e02da" name="更改" comment="添加Aura，长矛哥布林，弹弓哥布林动画蓝图">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Aura.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Aura.dir/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -144,7 +144,7 @@
       <workItem from="1729776449831" duration="144000" />
       <workItem from="1729776735564" duration="509000" />
       <workItem from="1729777702333" duration="961000" />
-      <workItem from="1729778688029" duration="5171000" />
+      <workItem from="1729778688029" duration="6067000" />
     </task>
     <task id="LOCAL-00001" summary="创建角色基类，派生角色子类，敌人子类">
       <option name="closed" value="true" />
@@ -162,7 +162,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729782797301</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="添加Aura，长矛哥布林，弹弓哥布林动画蓝图">
+      <option name="closed" value="true" />
+      <created>1729786276541</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1729786276541</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -174,7 +182,8 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="创建角色基类，派生角色子类，敌人子类" />
     <MESSAGE value="创建Aura角色和长矛哥布林敌人" />
-    <option name="LAST_COMMIT_MESSAGE" value="创建Aura角色和长矛哥布林敌人" />
+    <MESSAGE value="添加Aura，长矛哥布林，弹弓哥布林动画蓝图" />
+    <option name="LAST_COMMIT_MESSAGE" value="添加Aura，长矛哥布林，弹弓哥布林动画蓝图" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
