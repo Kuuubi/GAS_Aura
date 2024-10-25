@@ -5,6 +5,7 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Interaction/EnemyInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -50,6 +51,76 @@ void AAuraPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered,this, &AAuraPlayerController::Move);
 }
 
+//PlayerTick
+void AAuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
+}
+
+//鼠标跟踪
+void AAuraPlayerController::CursorTrace()
+{
+	//返回鼠标下命中
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	//是否命中被阻挡
+	if (!CursorHit.bBlockingHit) return;
+
+	LastActor = ThisActor;
+	//判断是否实现敌人接口，如果没实现，就会返回一个空指针
+	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+
+	/**
+	*	从鼠标光标跟踪开始的几种情况
+	*	A.	LastActor is null && ThisActor is null 都为空指针
+	*			-	鼠标光标下不是敌人，可能是墙或者地板或其他没有实现敌人接口，这种情况声明都不做
+	*	B.	LastActor is null && ThisActor is vaild 之前的actor是空的，现在的actor是有效的
+	*			-	鼠标光标从墙上滑动到敌人身上，要高亮这个敌人，Higliht ThisActor
+	*	C.	LastActor is vaild && ThisActor is null 之前的actor是有效的，现在是空的
+	*			-	鼠标从敌人滑动到墙上，要把敌人关闭高亮，UnHigliht LastActor
+	*	D.	两个都是is vaild，但是LastActor != ThisActor，他们不是同一个Actor
+	*			 -  鼠标光标从一个敌人滑动到另个敌人身上，UnHigliht LastActor，Higliht ThisActor
+	*	E.		两个都是is vaild，并且LastActor  = ThisActor，他们是同一个Actor
+	*			-	鼠标一直在这个敌人身上，不需要取消光亮，什么都不做
+	*/  
+	
+	if(LastActor == nullptr)
+	{
+		if(ThisActor != nullptr)
+		{
+			// Case B
+			ThisActor->HighlightActoer();
+		}
+		else
+		{
+			// Case A - 全部空指针
+		}
+	}
+	else // LastActor is valid
+	{
+		if (ThisActor == nullptr)
+		{
+			// Case C
+			LastActor->UnHighlightActoer();
+		}
+		else // 两个都有效
+		{
+			if (LastActor != ThisActor)
+			{
+				// Case D
+				LastActor -> UnHighlightActoer();
+				ThisActor->HighlightActoer();
+			}
+			else 
+			{
+				// Case E
+			}
+		}
+	}
+}
+
 void AAuraPlayerController::Move(const struct FInputActionValue& InputActionValue)
 {
 	//获取输入操作的2d向量值
@@ -72,3 +143,4 @@ void AAuraPlayerController::Move(const struct FInputActionValue& InputActionValu
 		ControllerPawn->AddMovementInput(RighterDirection , InputAxisVector.X);
 	};
 }
+
