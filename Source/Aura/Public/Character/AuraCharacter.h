@@ -15,4 +15,13 @@ class AURA_API AAuraCharacter : public AAuraCharacterBase
 	GENERATED_BODY()
 public:
 	AAuraCharacter ();
+
+	//ASC初始化
+	//服务端
+	virtual  void PossessedBy(AController* NewController) override;
+	//客户端
+	virtual  void OnRep_PlayerState() override;
+
+private:
+	void InitAbilityActorInfo();
 };
