@@ -45,6 +45,6 @@ private:
 
 	//鼠标跟踪函数
 	void CursorTrace();
-	IEnemyInterface* LastActor;
-	IEnemyInterface* ThisActor;
+	TObjectPtr<IEnemyInterface>  LastActor;
+	TObjectPtr<IEnemyInterface>  ThisActor;
 };

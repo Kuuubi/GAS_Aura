@@ -22,9 +22,12 @@ void AAuraPlayerController::BeginPlay()
 	//从本地角色上获取它的子系统
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	//子系统判空
-	check(Subsystem);
-	//添加映射上下文，优先级为0，可以添加多个
-	Subsystem->AddMappingContext(AuraContext, 0);
+	if (Subsystem)
+	{
+		//添加映射上下文，优先级为0，可以添加多个
+		Subsystem->AddMappingContext(AuraContext, 0);
+	}
+
 
 	//显示鼠标光标
 	bShowMouseCursor = true;
