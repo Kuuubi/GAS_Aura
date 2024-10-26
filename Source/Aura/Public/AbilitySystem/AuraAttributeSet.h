@@ -4,7 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
+#include "AbilitySystemComponent.h"
 #include "AuraAttributeSet.generated.h"
+
+#define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
+	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
+	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
+	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
 
 /**
  * 
@@ -26,9 +34,21 @@ public:
 	//Category设置类别
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health,  Category = "Vital Attributes")
 	FGameplayAttributeData Health;
+	//生命值属性访问器
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
 	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth,  Category = "Vital Attributes")
 	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxHealth);
+
+	//法力值
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana,  Category = "Vital Attributes")
+	FGameplayAttributeData Mana;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana,  Category = "Vital Attributes")
+	FGameplayAttributeData MaxMana;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, MaxMana);
 	
 		UFUNCTION()
 		void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
@@ -36,17 +56,9 @@ public:
 		UFUNCTION()
 		void Onrep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const;
 
-
-	//法力值
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana,  Category = "Vital Attributes")
-	FGameplayAttributeData Mana;
+		UFUNCTION()
+		void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
 	
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMana,  Category = "Vital Attributes")
-	FGameplayAttributeData MaxMana;
-
-	UFUNCTION()
-	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
-	
-	UFUNCTION()
-	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+		UFUNCTION()
+		void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
 };

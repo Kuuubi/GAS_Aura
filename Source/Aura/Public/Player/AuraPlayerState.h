@@ -32,5 +32,5 @@ protected:
 
 	UPROPERTY()
 	//属性集
-	TObjectPtr<UAttributeSet>AttributeSet;
+	TObjectPtr<UAttributeSet> AttributeSet;
 };

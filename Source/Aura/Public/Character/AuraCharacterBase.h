@@ -21,6 +21,7 @@ public:
 	virtual  UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//GetAS
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; };
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -35,5 +36,5 @@ protected:
 
 	UPROPERTY()
 	//属性集
-	TObjectPtr<UAttributeSet>AttributeSet;
+	TObjectPtr<UAttributeSet> AttributeSet;
 };
