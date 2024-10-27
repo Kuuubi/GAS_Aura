@@ -11,3 +11,9 @@ void UAuraWidgetController::SetWidgetControllerParams(const FWidgetControllerPar
 	AbilitySystemComponent = WCParams.AbilitySystemComponent;
 	AttributeSet = WCParams.AttributeSet;
 }
+
+//广播初始值函数
+void UAuraWidgetController::BroadcastInitialValues()
+{
+	
+}
