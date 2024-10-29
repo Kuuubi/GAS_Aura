@@ -49,7 +49,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
 	check((AuraPlayerState));
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState,this);
-	//设置两个指针
+	//设置ASC，AS指针
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState ->GetAttributeSet();
 

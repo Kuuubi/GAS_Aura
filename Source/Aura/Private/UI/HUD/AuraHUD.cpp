@@ -14,6 +14,8 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this,  OverlayWidgetControllerClass );
 		//调用控制器父类里的设置对应参数函数
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
+		//调用绑定回调到依赖函数，属性值变化时
+		OverlayWidgetController->BindCallbacksToDependencies();
 
 		return  OverlayWidgetController;
 	}

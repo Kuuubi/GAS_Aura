@@ -22,6 +22,8 @@ void AAuraPlayerController::BeginPlay()
 	//从本地角色上获取它的子系统
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	//子系统判空
+	//不能使用check(Subsystem)，否则多人游戏中有其他玩家，游戏会崩溃
+	//在多人游戏中，如果有其他玩家，此时在本机初始化其他玩家的时候，Subsystem为空
 	if (Subsystem)
 	{
 		//添加映射上下文，优先级为0，可以添加多个

@@ -3,52 +3,128 @@
 
 #include "Actor/AuraEffectActor.h"
 
-#include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
-#include "AbilitySystem/AuraAttributeSet.h"
-#include "Components/SphereComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+
 
 AAuraEffectActor::AAuraEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	//Mesh
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	//设置Mesh作为根组件
-	SetRootComponent(Mesh);
+	//设置根组件
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 
-	//Sphere
-	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	//把Sphere附加到Mesh，这样移动时Sphere也会移动
-	Sphere->SetupAttachment(GetRootComponent());
 }
 
-void AAuraEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	//TODO：更改此选项以应用GamePlayEffect，目前使用 const_cast 作为hack
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor))
-	{
-		const UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(ASCInterface->GetAbilitySystemComponent()->GetAttributeSet(UAuraAttributeSet::StaticClass()));
-		UAuraAttributeSet* MutableAuraAttributeSet=  const_cast<UAuraAttributeSet*>(AuraAttributeSet);
-		MutableAuraAttributeSet->SetHealth(AuraAttributeSet->GetHealth() + 25.f);
-		Destroy();
-	}
-}
 
-void AAuraEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	
-}
 
 void AAuraEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
 
-	//设置重叠时回调函数，就是球体开始重叠时触发的函数
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraEffectActor::OnOverlap);
-	//绑定到结束重叠时组件
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &AAuraEffectActor::EndOverlap);
+void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
+{
+	/*获取ASC方法一
+	 //检查目标是否实现ASC接口
+	 IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Target);
+	 if (ASCInterface)
+	 {
+	 //获取ASC
+	 ASCInterface->GetAbilitySystemComponent();
+	 }
+	 */
+
+	//获取ASC方法二
+	//通过使用静态函数库，就像static_math数学库以及像那样的静态函数库
+	//称为UAbilitySystemBlueprintLibrary
+	//它会返回一个ASC
+	UAbilitySystemComponent* TargetASC =  UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if ( TargetASC == nullptr) return;
+
+	//检查设置效果类
+	check(GameplayEffectClass);
+	
+	//游戏效果
+	//EffectContextHandle
+	FGameplayEffectContextHandle EffectContextHandle =  TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+	
+	//EffectSpecHandle
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass,1.f, EffectContextHandle);
+
+	//应用游戏效果
+	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+	
+	//检查持续时间策略
+	const bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite;
+	if (bIsInfinite && InfiniteEEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+	{
+		//添加键值对
+		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
+	}
+}
+
+//开始重叠函数
+void AAuraEffectActor::OnOverlap(AActor* TargetActor)
+{
+	//即时效果应用策略
+	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor , InstantGameplayEffectClass);
+	}
+	//持续效果应用策略
+	if(DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor , DurationGameplayEffectClass);
+	}
+	//无限效果应用策略
+	if(InfiniteEffectApplicationPolicy  == EEffectApplicationPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor , InfiniteGameplayEffectClass);
+	}
+}
+
+//结束重叠函数
+void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
+{
+	if(InstantEffectApplicationPolicy  == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor , InstantGameplayEffectClass);
+	}
+	if(DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor , DurationGameplayEffectClass);
+	}
+	if(InfiniteEffectApplicationPolicy  == EEffectApplicationPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor , InfiniteGameplayEffectClass);
+	}
+	
+	//无限效果移除策略
+	if(InfiniteEEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+	{
+		//获取ASC
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+		if (!IsValid(TargetASC)) return;
+
+		//遍历Map
+		TArray<FActiveGameplayEffectHandle> HandlesToRemove;
+		for (TTuple<FActiveGameplayEffectHandle, UAbilitySystemComponent*>  HandlePair : ActiveEffectHandles)
+		{
+			if (TargetASC ==  HandlePair.Value)
+			{
+				//移除游戏效果
+				TargetASC->RemoveActiveGameplayEffect(HandlePair.Key, 1);
+				HandlesToRemove.Add(HandlePair.Key);
+			}
+		}
+		//循环数组
+		for(FActiveGameplayEffectHandle& Handle : HandlesToRemove)
+		{
+			ActiveEffectHandles.FindAndRemoveChecked(Handle);
+		}
+	}
 }
 

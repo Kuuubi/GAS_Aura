@@ -13,6 +13,47 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+//结构宏
+USTRUCT()
+//属性影响结构体
+struct FEffectProperties
+{
+	//正文宏
+	GENERATED_BODY()
+
+	FEffectProperties(){}
+
+	//EffectContextHandle
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	//指针，确保初始化null
+	//Source
+	UPROPERTY()
+	UAbilitySystemComponent* SourceASC = nullptr;
+	
+	UPROPERTY()
+	AActor* SourceAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* SourceController = nullptr;
+
+	UPROPERTY()
+	ACharacter* SourceCharacter = nullptr;
+
+	//Target
+	UPROPERTY()
+	UAbilitySystemComponent* TargetASC = nullptr;
+	
+	UPROPERTY()
+	AActor* TargetAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* TargetController = nullptr;
+
+	UPROPERTY()
+	ACharacter* TargetCharacter = nullptr;
+	
+};
 
 /**
  * 
@@ -27,6 +68,11 @@ public:
 	UAuraAttributeSet();
 	//注册变量，指定哪些属性需要在服务器和客户端同步，并定义每个属性的复制条件
 	virtual  void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	//属性值变化前触发函数
+	virtual  void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	//属性值变化后触发函数
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 	//生命值
 	//BlueprintReadOnly设置蓝图只读
@@ -61,4 +107,9 @@ public:
 	
 		UFUNCTION()
 		void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+protected:
+
+	//设置属性影响结构体函数
+	void SetFEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 };

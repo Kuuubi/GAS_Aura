@@ -50,6 +50,9 @@ public:
 	//广播初始值函数
 	virtual void BroadcastInitialValues();
 
+	//绑定回调到依赖项
+	virtual  void BindCallbacksToDependencies();
+
 protected:
 	//创建所需数据的四个指针
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
