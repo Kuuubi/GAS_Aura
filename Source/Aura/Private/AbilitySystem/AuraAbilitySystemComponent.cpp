@@ -17,12 +17,7 @@ void UAuraAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* Ability
 	FGameplayTagContainer TagContainer;
 	//获取游戏效果的资产标签
 	EffectSpec.GetAllAssetTags(TagContainer);
-	//循环
-	for(const FGameplayTag Tag : TagContainer)
-	{
-		//TODO：将Tag广播到组件控制器
-		//获取标签名称
-		const FString Msg = FString::Printf(TEXT("GE Tag：%s"), *Tag.ToString());
-		GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Msg);
-	}
+
+	//广播标签容器
+	EffectAssetTags.Broadcast(TagContainer);
 }

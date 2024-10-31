@@ -6,6 +6,10 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemComponent.generated.h"
 
+//声明多播委托Tag
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* AssetTags*/)
+
+
 /**
  * 
  */
@@ -17,6 +21,9 @@ class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	//AbilityActorInfo初始化完成后调用
 	void AbilityActorInfoSet();
+
+	//公开广播Tag
+	FEffectAssetTags EffectAssetTags;
 
 protected:
 	//效果应用回调函数
