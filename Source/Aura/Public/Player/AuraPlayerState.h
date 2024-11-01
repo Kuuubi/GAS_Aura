@@ -26,7 +26,7 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; };
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	//技能系统组件
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
