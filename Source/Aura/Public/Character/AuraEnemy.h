@@ -23,10 +23,21 @@ public:
 	virtual void HighlightActoer() override;
 	//取消高亮
 	virtual void UnHighlightActoer() override;
-	/** Enemy Interface */
+	/** end Enemy Interface */
+
+	/** Combat Interface */
+	//获取敌人等级
+	virtual int32 GetPlayerLevel() override;
+	/** end Combat Interface */
 
 protected:
 	virtual  void BeginPlay() override;
+	
+	//初始化AbilityActorInfo
 	virtual void InitAbilityActorInfo() override;
+
+	//敌人等级
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	int32 Level = 1;
 	
 };

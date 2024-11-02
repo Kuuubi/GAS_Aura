@@ -22,6 +22,11 @@ public:
 	//客户端
 	virtual  void OnRep_PlayerState() override;
 
+	/** Combat Interface */
+	//获取玩家等级
+	virtual int32 GetPlayerLevel() override;
+	/** end Combat Interface */
+
 private:
 	virtual void InitAbilityActorInfo() override;
 };

@@ -40,6 +40,12 @@ void AAuraEnemy::UnHighlightActoer()
 	Weapon->SetRenderCustomDepth(false);
 }
 
+//获取敌人等级
+int32 AAuraEnemy::GetPlayerLevel()
+{
+	return Level;
+}
+
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();

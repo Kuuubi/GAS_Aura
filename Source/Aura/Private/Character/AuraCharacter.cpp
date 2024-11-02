@@ -44,6 +44,15 @@ void AAuraCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+int32 AAuraCharacter::GetPlayerLevel()
+{
+	//检查玩家状态
+	const AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check((AuraPlayerState));
+	//获取玩家等级
+	return AuraPlayerState->GetPlayerLevel();
+}
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	//初始化ability  actor info
