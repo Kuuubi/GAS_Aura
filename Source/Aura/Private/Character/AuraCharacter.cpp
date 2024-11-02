@@ -67,7 +67,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 		}
 	}
 
-	//初始化主要属性
-	InitializePrimaryAttribute();
+	//初始化游戏效果于属性
+	InitializeDefaultAttribute();
 	
 }

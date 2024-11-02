@@ -45,7 +45,13 @@ protected:
 	//默认主要属性游戏效果
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+	
+	//默认次要属性游戏效果
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
+    TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 
-	//初始化默认主要属性
-	void InitializePrimaryAttribute() const;
+	//应用游戏效果于属性
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+	void InitializeDefaultAttribute() const;
+	
 };
