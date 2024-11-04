@@ -3,6 +3,7 @@
 
 #include "UI/HUD/AuraHUD.h"
 
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 //创建或返回Overlay控制器
@@ -16,10 +17,21 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
 		//调用绑定回调到依赖函数，属性值变化时
 		OverlayWidgetController->BindCallbacksToDependencies();
-
-		return  OverlayWidgetController;
 	}
 	return OverlayWidgetController;
+}
+
+UAttributeMenuWidgetController* AAuraHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		//使用新对象为蓝图设置的AttributeMenu组件控制器类创建组件控制器
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this,  AttributeMenuWidgetControllerClass );
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		//绑定监听数值变化
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return AttributeMenuWidgetController;
 }
 
 //初始化Overlay

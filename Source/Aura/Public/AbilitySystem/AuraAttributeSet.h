@@ -55,6 +55,13 @@ struct FEffectProperties
 	
 };
 
+//typedef是专一FGameplayAttribute()的签名，但是 TStaticFuncPtr 对任何签名都有用。
+//静态委托实例
+//typedef TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr FAttributeFuncPtr;
+//模板
+template<class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -62,7 +69,7 @@ UCLASS()
 class AURA_API UAuraAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-
+	
 public:
 	//声明属性函数
 	UAuraAttributeSet();
@@ -74,6 +81,8 @@ public:
 	//属性值变化后触发函数
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	//Map标签到属性
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
 	/*
 	 * 主要属性

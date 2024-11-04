@@ -48,6 +48,7 @@ public:
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
 
 	//广播初始值函数
+	UFUNCTION(BlueprintCallable)	
 	virtual void BroadcastInitialValues();
 
 	//绑定回调到依赖项
