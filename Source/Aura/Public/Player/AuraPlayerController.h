@@ -6,10 +6,13 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+struct FGameplayTag;
+class UAuraInputConfig;
 class UInputMappingContext;
 class UInputAction;
 struct  FInputActionValue;
 class IEnemyInterface;
+class UAuraAbilitySystemComponent;
 
 /**
  * 
@@ -47,4 +50,19 @@ private:
 	void CursorTrace();
 	IEnemyInterface*  LastActor;
 	IEnemyInterface*  ThisActor;
+
+	//绑定输入回调函数
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+
+	//蓝图设置输入配置数据资产
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
+
+	//能力系统组件
+	UPROPERTY()
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+	///第一次访问时设置它，获取ASC
+	UAuraAbilitySystemComponent* GetASC();
 };

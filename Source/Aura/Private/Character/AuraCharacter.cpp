@@ -34,6 +34,8 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 
 	//服务器初始化ability  actor info
 	InitAbilityActorInfo();
+	//添加角色能力
+	AddCharacterAbilities();
 }
 
 void AAuraCharacter::OnRep_PlayerState()
