@@ -9,21 +9,11 @@
   <component name="ChangeListManager">
     <list default="true" id="77e3684d-be5c-4b1f-973c-bfbe2a0e02da" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Aura.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Aura.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aura.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/Aura.uproject" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Aura.uproject.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Aura.uproject.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultInput.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultInput.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/Character/Aura/BP_AuraCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/Character/Aura/BP_AuraCharacter.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/Input/IMC_AuraContext.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/Input/IMC_AuraContext.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/Player/BP_AuraPlayerController.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/Player/BP_AuraPlayerController.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Maps/StartupMap.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Maps/StartupMap.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Private/AbilitySystem/AuraAbilitySystemComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Private/AbilitySystem/AuraAbilitySystemComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Private/AuraGameplayTags.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Private/AuraGameplayTags.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Private/Character/AuraCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Private/Character/AuraCharacter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Private/Character/AuraCharacterBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Private/Character/AuraCharacterBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/Aura/Aura.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Aura.Build.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Aura/Private/Player/AuraPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Private/Player/AuraPlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Public/AbilitySystem/AuraAbilitySystemComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Public/AbilitySystem/AuraAbilitySystemComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Public/AuraGameplayTags.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Public/AuraGameplayTags.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/Aura/Public/Character/AuraCharacterBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Public/Character/AuraCharacterBase.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/Aura/Public/Player/AuraPlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Aura/Public/Player/AuraPlayerController.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,12 +48,14 @@
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/Delegates/DelegateSignatureImpl.inl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/Logging/LogVerbosity.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/Math/MathFwd.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/Math/Vector.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/Templates/SharedPointer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/Templates/Tuple.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/CoreUObject/Private/UObject/Class.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/Components/PrimitiveComponent.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/Engine/HitResult.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/Engine/World.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/GameFramework/GameStateBase.h" root0="FORCE_HIGHLIGHTING" />
@@ -73,6 +65,9 @@
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Private/Character.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/GameplayTags/Private/GameplayTagContainer.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/NavigationSystem/Private/NavigationSystemModule.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/NavigationSystem/Public/NavigationPath.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/NavigationSystem/Public/NavigationSystem.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/TraceLog/Private/Trace/Control.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/TraceLog/Private/Trace/Detail/Windows/WindowsTrace.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://D:/Game/Epic Games/UE_5.4/Engine/Source/Runtime/TraceLog/Private/Trace/EventNode.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -231,7 +226,10 @@
       <workItem from="1730721357753" duration="43544000" />
       <workItem from="1730824242443" duration="31109000" />
       <workItem from="1730872028755" duration="705000" />
-      <workItem from="1730872943944" duration="14251000" />
+      <workItem from="1730872943944" duration="14984000" />
+      <workItem from="1730941124264" duration="7892000" />
+      <workItem from="1730960183642" duration="17690000" />
+      <workItem from="1730985645511" duration="3552000" />
     </task>
     <task id="LOCAL-00001" summary="创建角色基类，派生角色子类，敌人子类">
       <option name="closed" value="true" />
@@ -393,7 +391,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730762441529</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="通过InputTag激活GameplayAbility">
+      <option name="closed" value="true" />
+      <created>1730891600712</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1730891600712</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -434,7 +440,8 @@
     <MESSAGE value="MMC，重要属性GE应用初始化" />
     <MESSAGE value="属性面板" />
     <MESSAGE value="属性面板组件控制器广播属性数值" />
-    <option name="LAST_COMMIT_MESSAGE" value="属性面板组件控制器广播属性数值" />
+    <MESSAGE value="通过InputTag激活GameplayAbility" />
+    <option name="LAST_COMMIT_MESSAGE" value="通过InputTag激活GameplayAbility" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
