@@ -51,6 +51,7 @@ private:
 	void CursorTrace();
 	IEnemyInterface*  LastActor;
 	IEnemyInterface*  ThisActor;
+	FHitResult CursorHit;
 
 	//绑定输入回调函数
 	void AbilityInputTagPressed(FGameplayTag InputTag);

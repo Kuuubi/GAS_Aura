@@ -30,6 +30,14 @@ void AAuraCharacterBase::BeginPlay()
 	
 }
 
+//返回施法骨骼插槽位置
+FVector AAuraCharacterBase::GetCombatSocketLocation()
+{
+	check(Weapon)
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
+
+
 void AAuraCharacterBase::InitAbilityActorInfo()
 {
 }

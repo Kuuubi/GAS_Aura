@@ -24,4 +24,6 @@ class AURA_API ICombatInterface
 public:
 	//获取等级
 	virtual int32 GetPlayerLevel();
+	//获取要生成火球的骨骼插槽位置
+	virtual FVector GetCombatSocketLocation();
 };

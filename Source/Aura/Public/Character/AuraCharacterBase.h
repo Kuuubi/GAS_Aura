@@ -33,6 +33,12 @@ protected:
 	//名为Weapon的骨骼网格组件
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
+	//用于施法的骨骼插槽
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName WeaponTipSocketName;
+	//获取生成火球的骨骼插槽位置
+	virtual FVector GetCombatSocketLocation() override;
+
 	UPROPERTY()
 	//技能系统组件
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

@@ -85,61 +85,17 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 void AAuraPlayerController::CursorTrace()
 {
 	//返回鼠标下命中
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	//是否命中被阻挡
 	if (!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;
-	//判断是否实现敌人接口，如果没实现，就会返回一个空指针
+	//判断是否实现敌人接口
 	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-
-	/**
-	*	从鼠标光标跟踪开始的几种情况
-	*	A.	LastActor is null && ThisActor is null 都为空指针
-	*			-	鼠标光标下不是敌人，可能是墙或者地板或其他没有实现敌人接口，这种情况声明都不做
-	*	B.	LastActor is null && ThisActor is vaild 之前的actor是空的，现在的actor是有效的
-	*			-	鼠标光标从墙上滑动到敌人身上，要高亮这个敌人，Higliht ThisActor
-	*	C.	LastActor is vaild && ThisActor is null 之前的actor是有效的，现在是空的
-	*			-	鼠标从敌人滑动到墙上，要把敌人关闭高亮，UnHigliht LastActor
-	*	D.	两个都是is vaild，但是LastActor != ThisActor，他们不是同一个Actor
-	*			 -  鼠标光标从一个敌人滑动到另个敌人身上，UnHigliht LastActor，Higliht ThisActor
-	*	E.		两个都是is vaild，并且LastActor  = ThisActor，他们是同一个Actor
-	*			-	鼠标一直在这个敌人身上，不需要取消光亮，什么都不做
-	*/  
-	
-	if(LastActor == nullptr)
+	if (LastActor != ThisActor)
 	{
-		if(ThisActor != nullptr)
-		{
-			// Case B
-			ThisActor->HighlightActoer();
-		}
-		else
-		{
-			// Case A - 全部空指针
-		}
-	}
-	else // LastActor is valid
-	{
-		if (ThisActor == nullptr)
-		{
-			// Case C
-			LastActor->UnHighlightActoer();
-		}
-		else // 两个都有效
-		{
-			if (LastActor != ThisActor)
-			{
-				// Case D
-				LastActor -> UnHighlightActoer();
-				ThisActor->HighlightActoer();
-			}
-			else 
-			{
-				// Case E
-			}
-		}
+		if (LastActor) LastActor->UnHighlightActoer();
+		if (ThisActor) ThisActor->HighlightActoer();
 	}
 }
 
@@ -166,27 +122,21 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	//如果不是鼠标左键标签
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			//输入被按下
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		//输入被按下
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 		return;
 	}
 	
 	//瞄准敌人
 	if (bTargeting)
 	{
-		if (GetASC())
-		{
-			//输入被按下
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		//输入被按下
+		if (GetASC())	GetASC()->AbilityInputTagReleased(InputTag);
 	}
 	else	//实现自动寻路
 	{
 		//获取Pawn
-		APawn* ControlledPawn = GetPawn();
+		const APawn* ControlledPawn = GetPawn();
 		//短按
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
@@ -201,7 +151,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				{
 					//样条曲线添加点
 					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Orange, false, 5.f);
+					//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Orange, false, 5.f);
 				}
 				//将路径最后一个点位设置成目的地
 				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
@@ -222,22 +172,16 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	//如果不是鼠标左键标签
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			//输入被按下
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		//输入被按下
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 		return;
 	}
 	
 	//瞄准敌人
 	if (bTargeting)
 	{
-		if (GetASC())
-		{
-			//输入被按下
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		//输入被按下
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}
 	else	//实现左键长按移动
 	{
@@ -245,12 +189,9 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		FollowTime += GetWorld()->GetDeltaSeconds();
 
 		//鼠标光标射线跟踪命中结果
-		FHitResult Hit;
-		if (GetHitResultUnderCursor(ECC_Visibility, false, Hit))
-		{
-			//缓存击中点位置
-			CachedDestination = Hit.ImpactPoint;
-		}
+		//缓存击中点位置
+		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
+
 		//朝向移动
 		//获取有效被占用的Pawn
 		if (APawn* ControllerPawn = GetPawn())
