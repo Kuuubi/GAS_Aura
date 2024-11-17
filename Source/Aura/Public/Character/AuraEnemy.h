@@ -6,6 +6,7 @@
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AuraEnemy.generated.h"
 
 class UWidgetComponent;
@@ -44,9 +45,16 @@ protected:
 	//初始化AbilityActorInfo
 	virtual void InitAbilityActorInfo() override;
 
+	//初始化属性值
+	virtual void InitializeDefaultAttribute() const override;
+
 	//敌人等级
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 	int32 Level = 1;
+
+	//敌人职业
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	//血量条
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
