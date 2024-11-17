@@ -63,7 +63,10 @@ void AAuraPlayerController::SetupInputComponent()
 	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
 
 	//绑定动作事件，MoveAction输入动作，一直按下时调用Move函数
-	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered,this, &AAuraPlayerController::Move);
+	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	//ShiftAction，按住时始终触发
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AAuraPlayerController::ShiftReleased);
 
 	//绑定能力输入操作
 	AuraInputComponent->BindAbilityActions(InputConfig, this,&ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
@@ -128,41 +131,43 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	}
 	
 	//瞄准敌人
-	if (bTargeting)
+	if (GetASC())	GetASC()->AbilityInputTagReleased(InputTag);
+	
+	//实现自动寻路
+	if (!bTargeting && !bShiftKeyDown)
 	{
 		//输入被按下
 		if (GetASC())	GetASC()->AbilityInputTagReleased(InputTag);
-	}
-	else	//实现自动寻路
-	{
-		//获取Pawn
-		const APawn* ControlledPawn = GetPawn();
-		//短按
-		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
-			//创建导航路径
-			if(UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+			//获取Pawn
+			const APawn* ControlledPawn = GetPawn();
+			//短按
+			if (FollowTime <= ShortPressThreshold && ControlledPawn)
 			{
-				//样条曲线
-				//清除样条内现有的点
-				Spline->ClearSplinePoints();
-				//遍历路径点数组
-				for (const FVector& PointLoc : NavPath->PathPoints)
+				//创建导航路径
+				if(UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
 				{
-					//样条曲线添加点
-					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Orange, false, 5.f);
+					//样条曲线
+					//清除样条内现有的点
+					Spline->ClearSplinePoints();
+					//遍历路径点数组
+					for (const FVector& PointLoc : NavPath->PathPoints)
+					{
+						//样条曲线添加点
+						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+						//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Orange, false, 5.f);
+					}
+					//将路径最后一个点位设置成目的地
+					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+					//自动寻路
+					bAutoRunning = true;
 				}
-				//将路径最后一个点位设置成目的地
-				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
-				//自动寻路
-				bAutoRunning = true;
 			}
+			//重置长按时间
+			FollowTime = 0.f;
+			//重置是否选择目标
+			bTargeting = false;
 		}
-		//重置长按时间
-		FollowTime = 0.f;
-		//重置是否选择目标
-		bTargeting = false;
 	}
 }
 
@@ -178,7 +183,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	}
 	
 	//瞄准敌人
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		//输入被按下
 		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);

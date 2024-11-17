@@ -42,6 +42,16 @@ private:
 	//添加输入操作
 	TObjectPtr<UInputAction> MoveAction;
 
+	//Shift输入操作
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
+	//Shift按住时回调
+	void ShiftPressed() { bShiftKeyDown = true; }
+	//Shift释放时回调
+	void ShiftReleased() { bShiftKeyDown = false; }
+	bool bShiftKeyDown = false;
+
 	//移动函数
 	//输入操作需要绑定一个函数
 	//函数必须传入FInputActionValue值
