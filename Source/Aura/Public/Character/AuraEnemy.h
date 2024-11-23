@@ -31,6 +31,8 @@ public:
 	/** Combat Interface */
 	//获取敌人等级
 	virtual int32 GetPlayerLevel() override;
+	//角色死亡
+	virtual void Die() override;
 	/** end Combat Interface */
 
 	//委托血量
@@ -38,6 +40,21 @@ public:
 	FOnAttributeChangedSignature OnHealthChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
+
+	//受击反馈回调
+	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	//是否被击中
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	bool bHitReacting = false;
+
+	//设置移动速度
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	float BaseWalkSpeed = 250.f;
+
+	//设置死亡后存在时间
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	float LifeSpan = 5.f;
 
 protected:
 	virtual  void BeginPlay() override;
@@ -59,4 +76,5 @@ protected:
 	//血量条
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+	
 };

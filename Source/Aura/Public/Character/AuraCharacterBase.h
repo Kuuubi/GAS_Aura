@@ -12,6 +12,7 @@ class UGameplayAbility;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UAnimMontage;
 
 UCLASS(Abstract)
 class AURA_API AAuraCharacterBase : public ACharacter, public  IAbilitySystemInterface, public ICombatInterface
@@ -24,6 +25,16 @@ public:
 	virtual  UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//GetAS
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; };
+
+	//获取受击反应蒙太奇动画
+	virtual  UAnimMontage* GetHitReactMontage_Implementation() override;
+
+	//角色死亡
+	virtual void Die() override;
+
+	//多播死亡
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
 
 protected:
 	virtual void BeginPlay() override;
@@ -69,10 +80,31 @@ protected:
 	//添加角色能力
 	void AddCharacterAbilities();
 
+	/* Dissolve Effects */
+
+	//溶解函数
+	void Dissolve();
+
+	//溶解时间轴
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	
+	//创建材质实例
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
 private:
 
 	//能力列表
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
-	
+
+	//设置受击反应蒙太奇动画
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

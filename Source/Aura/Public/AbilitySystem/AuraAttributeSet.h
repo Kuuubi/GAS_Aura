@@ -181,6 +181,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana,  Category = "Vital Attributes")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
+
+	
+	/*
+	 * 元属性
+	 */
+	//传入伤害元属性
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
 	
 
 
@@ -235,8 +244,11 @@ public:
 	UFUNCTION()
 	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
 
-protected:
+private:
 
 	//设置属性影响结构体函数
+	//获取效果的来源和目标
 	void SetFEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
+	//显示浮动文本
+	void ShowFloatingText(const FEffectProperties& Props, float Damage) const;
 };

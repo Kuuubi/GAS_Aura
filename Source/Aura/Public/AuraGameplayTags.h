@@ -51,6 +51,16 @@ public:
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
+	
+	/*
+	* 伤害标签
+	*/
+	FGameplayTag Damage;
+
+	/*
+	* 受击标签
+	*/
+	FGameplayTag Effects_HitReact;
 
 private:
 	//静态成员变量

@@ -12,6 +12,8 @@
 #include "Components/SplineComponent.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "GameFramework/Character.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -81,6 +83,23 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	
 	//自动寻路
 	AutoRun();
+}
+
+void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		//创建伤害文本组件
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		//动态创建的组件需要调用注册组件
+		DamageText->RegisterComponent();
+		//将伤害文本组件添加到目标角色根组件上，并保持变换
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		//伤害文本和目标角色分离，不跟随角色移动
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		//设置伤害文本
+		DamageText->SetDamageText(DamageAmount);
+	}
 }
 
 //高亮敌人轮廓

@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageTextComponent;
 struct FGameplayTag;
 class UAuraInputConfig;
 class UInputMappingContext;
@@ -24,13 +25,18 @@ class AURA_API AAuraPlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	AAuraPlayerController();
+	//重写PlayerTick
+	virtual void PlayerTick(float DeltaTime) override;
+
+	//显示伤害文本
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
+	
 protected:
 	//重写BeginPlay
 	virtual void BeginPlay() override;
 	//重写设置输入组件
 	virtual  void SetupInputComponent() override;
-	//重写PlayerTick
-	virtual void PlayerTick(float DeltaTime) override;
 private:
 	//属性
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -99,4 +105,8 @@ private:
 
 	//自动寻路
 	void AutoRun();
+
+	//设置伤害文本组件类
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };

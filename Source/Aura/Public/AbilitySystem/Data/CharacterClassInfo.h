@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "CharacterClassInfo.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 
 //角色职业枚举
@@ -52,6 +53,10 @@ public:
 	//共享的主要属性
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
+
+	//共享的GA
+	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
+	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 
 	//通过职业枚举获取对应的主要属性
 	FCharacterClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass);

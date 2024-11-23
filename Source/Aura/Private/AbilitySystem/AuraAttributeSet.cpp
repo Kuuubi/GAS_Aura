@@ -8,6 +8,9 @@
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 #include "AuraGameplayTags.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/AuraPlayerController.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -160,16 +163,73 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	SetFEffectProperties(Data, Props);
 
 	//变化后夹紧属性值
+	//最大血量
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.1, GetMaxHealth()));
-		UE_LOG(LogTemp, Warning, TEXT("%s 的生命值发生变化, 当前生命值：%f"), *Props.TargetAvatarActor->GetName(), GetHealth())
+		//UE_LOG(LogTemp, Warning, TEXT("%s 的生命值发生变化, 当前生命值：%f"), *Props.TargetAvatarActor->GetName(), GetHealth())
 	}
+	//最大法力值
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.1, GetMaxMana()));
 	}
+
+	//元属性计算
+	//传入伤害元属性
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float LocalIncomingDamage = GetIncomingDamage();
+		SetIncomingDamage(0.f);
+		//执行计算
+		if (LocalIncomingDamage > 0.f)
+		{
+			//修改血量
+			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+			//致命伤害
+			const bool bFatal = NewHealth <= 0.f;
+			if (bFatal)
+			{
+				//角色死亡
+				ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				{
+					//受击反应
+					//标签容器
+					FGameplayTagContainer TagContainer;
+					TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
+					//根据标签激活能力
+					Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+				}
+
+				//伤害文本
+				ShowFloatingText(Props, LocalIncomingDamage);
+			}
+		}
+	}
 	
+}
+
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+{
+	//生成伤害数字
+	//不显示自己对自己造成伤害
+	if (Props.SourceCharacter != Props.TargetCharacter)
+	{
+		//获取本地玩家控制器
+		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+		}
+	}
 }
 
 //GE预测旧值
