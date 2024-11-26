@@ -4,8 +4,12 @@
 #include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraAbilityTypes.h"
 #include "AuraGameplayTags.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Interaction/CombatInterface.h"
 
 //捕获定义结构体
 struct AuraDamageStatics
@@ -17,12 +21,21 @@ struct AuraDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(ArmorPenetration);
 	//格挡几率
 	DECLARE_ATTRIBUTE_CAPTUREDEF(BlockChance);
+	//暴击几率
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
+	//暴击伤害
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
+	//暴击抵抗
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
 	AuraDamageStatics()
 	{
 		//捕获定义参数宏
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Armor, Target, false)
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, ArmorPenetration, Source, false)
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, BlockChance, Target, false)
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitChance, Source, false)
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitDamage, Source, false)
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitResistance, Target, false)
 	}
 };
 
@@ -38,6 +51,9 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorPenetrationDef);
 	RelevantAttributesToCapture.Add(DamageStatics().BlockChanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitChanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitDamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -52,6 +68,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	AActor* SourceAvatar = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
 	AActor* TargetAvatar = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
 
+	//调用战斗接口获取玩家等级
+	ICombatInterface* SourceCombatInterface = Cast<ICombatInterface>(SourceAvatar);
+	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
+	int32 SourcePlayerLevel = SourceCombatInterface->GetPlayerLevel();
+	int32 TargetPlayerLevel = TargetCombatInterface->GetPlayerLevel();
+
 	//获取Spec信息
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 
@@ -65,8 +87,15 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluateParameters.TargetTags = TargetTags;
 
 	
-	//从 由调用者设置 获取Damage标签的值
-	float Damage = Spec.GetSetByCallerMagnitude(FAuraGameplayTags::Get().Damage);
+	//获取伤害类型对应的伤害值
+	float Damage = 0.f;
+	//遍历伤害类型对应抗性TMap
+	for (const TTuple<FGameplayTag, FGameplayTag>& Pair  : FAuraGameplayTags::Get().DamageTypesToResistances)
+	{
+		//从 由调用者设置 通过Tag找到对应的值
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key);
+		Damage += DamageTypeValue;
+	}
 
 	//计算捕获属性的数值
 	/* 格挡几率 */
@@ -77,9 +106,16 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TargetBlockChance = FMath::Max<float>( 0.0f, TargetBlockChance);
 	//判断攻击是否被成功阻挡，如果阻挡成功，伤害将减半
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
+
+	//获取Context
+	FGameplayEffectContextHandle EffectContextHandle =  Spec.GetContext();
+	//Context设置是否成功格挡
+	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
+	
+	//格挡伤害计算
 	Damage = bBlocked ? Damage / 2.f : Damage;
 
-	/* 护甲和护甲穿透 */
+	/* 护甲，护甲穿透 */
 	//目标护甲
 	float TargetArmor = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorDef, EvaluateParameters, TargetArmor);
@@ -92,11 +128,58 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	//夹紧属性值
 	SourceArmorPenetration = FMath::Max<float>(0.f, SourceArmorPenetration);
 
+	//获取角色类信息数据资产
+	UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatar);
+	
+	//查找护甲穿透曲线
+	const FRealCurve* ArmorPenetrationCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("ArmorPenetration"), FString());
+	//来源玩家等级对应的护甲穿透系数
+	const float SourceArmorPenetrationCoefficients = ArmorPenetrationCurve->Eval(SourcePlayerLevel);
+	
 	//护甲穿透会忽略目标护甲百分比
-	//有效护甲值
-	const float EffectiveArmor = TargetArmor *= ( 100 - SourceArmorPenetration * 0.25f) / 100.f;
-	//最终伤害
-	Damage *= ( 100 - EffectiveArmor * 0.333f ) / 100.f;
+	//目标有效护甲
+	const float EffectiveArmor = TargetArmor * ( 100 - SourceArmorPenetration * SourceArmorPenetrationCoefficients) / 100.f;
+
+	//查找护甲曲线
+	const FRealCurve* EffectiveArmorCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectiveArmor"), FString());
+	//目标玩家等级对应的护甲系数
+	const float TargetEffectiveArmorCoefficients = EffectiveArmorCurve->Eval(TargetPlayerLevel);
+
+	//伤害 * 目标护甲百分比忽略受到的伤害
+	Damage *= ( 100 - EffectiveArmor * TargetEffectiveArmorCoefficients) / 100.f;
+
+	/* 暴击几率，暴击伤害，暴击抵抗 */
+	//来源暴击几率
+	float SourceCriticalHitChance = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitChanceDef, EvaluateParameters, SourceCriticalHitChance);
+	SourceCriticalHitChance = FMath::Max<float>(0.f, SourceCriticalHitChance);
+
+	//来源暴击伤害
+	float SourceCriticalHitDamage = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitDamageDef, EvaluateParameters, SourceCriticalHitDamage);
+	SourceCriticalHitDamage = FMath::Max<float>(0.f, SourceCriticalHitDamage);
+
+	//目标暴击抵抗
+	float TargetCriticalHitResistance = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitResistanceDef, EvaluateParameters, TargetCriticalHitResistance);
+	TargetCriticalHitResistance = FMath::Max<float>(0.f, TargetCriticalHitResistance);
+
+	//查找暴击抵抗曲线
+	const FRealCurve* CriticalHitResistanceCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("CriticalHitResistance"), FString());
+	//目标玩家等级对应的暴击抵抗系数
+	const float TargetCriticalHitResistanceCoefficients = CriticalHitResistanceCurve->Eval(TargetPlayerLevel);
+
+	//来源有效暴击几率
+	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * TargetCriticalHitResistanceCoefficients;
+	//判断暴击
+	const bool bCriticalHit = FMath::RandRange(1, 100) < EffectiveCriticalHitChance;
+	
+	//Context设置是否成功暴击
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bCriticalHit);
+	
+	//暴击伤害计算
+	Damage = bCriticalHit ? Damage * 2.f  + SourceCriticalHitDamage: Damage;
+	
 	
 	//计算方式
 	//const FGameplayModifierEvaluatedData EvaluatedData(DamageStatics().ArmorProperty, EGameplayModOp::Additive, Armor);

@@ -43,6 +43,14 @@ public:
 	FGameplayTag Attributes_Secondary_MaxMana;
 
 	/*
+	* 属性抗性标签
+	*/
+	FGameplayTag Attributes_Resistance_Fire;
+	FGameplayTag Attributes_Resistance_Lightning;
+	FGameplayTag Attributes_Resistance_Arcane;
+	FGameplayTag Attributes_Resistance_Physical;
+
+	/*
 	* 输入标签
 	*/
 	FGameplayTag InputTag_LMB;
@@ -53,9 +61,16 @@ public:
 	FGameplayTag InputTag_4;
 	
 	/*
-	* 伤害标签
+	* 伤害类型标签
 	*/
 	FGameplayTag Damage;
+	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Lightning;
+	FGameplayTag Damage_Arcane;
+	FGameplayTag Damage_Physical;
+
+	//伤害类型对应抗性
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 
 	/*
 	* 受击标签

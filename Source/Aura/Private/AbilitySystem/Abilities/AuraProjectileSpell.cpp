@@ -57,18 +57,37 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		//设置伤害
 		//获取ASC
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+
+		//EffectContextHandle
+		FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+		//设置能力
+		EffectContextHandle.SetAbility(this);
+		//添加SourceObject
+		EffectContextHandle.AddSourceObject(Projectile);
+		//添加Actors数组
+		TArray<TWeakObjectPtr<AActor>> Actors;
+		Actors.Add(Projectile);
+		EffectContextHandle.AddActors(Actors);
+		//添加命中结果
+		FHitResult HitResult;
+		HitResult.Location = ProjectileTargetLocation;
+		EffectContextHandle.AddHitResult(HitResult);
+		
+
 		//SpecHandle
-		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 
 		//获取标签单例
 		FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 
-		//曲线表根据等级获取技能伤害
-		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-		//GEngine->AddOnScreenDebugMessage(-1 ,3.f, FColor::Red, FString::Printf(TEXT("FireBlot Damage: %f"), ScaledDamage));
-
-		//由调用者设置
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
+		//遍历DamageTypes
+		for (auto& Pair : DamageTypes)
+		{
+			//曲线表根据等级获取技能伤害
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			//由调用者设置
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		}
 		
 		//设置生成的抛射物SpecHandle
 		Projectile->DamageEffectSpecHandle = SpecHandle;

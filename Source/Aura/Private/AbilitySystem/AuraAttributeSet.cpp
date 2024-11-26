@@ -8,6 +8,7 @@
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 #include "AuraGameplayTags.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
@@ -209,16 +210,20 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 					//根据标签激活能力
 					Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 				}
-
+				
+				//判断是否成功格挡
+				const bool bBlockHit = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+				//判断是否成功暴击
+				const bool bCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
 				//伤害文本
-				ShowFloatingText(Props, LocalIncomingDamage);
+				ShowFloatingText(Props, LocalIncomingDamage, bBlockHit, bCriticalHit);
 			}
 		}
 	}
 	
 }
 
-void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const
 {
 	//生成伤害数字
 	//不显示自己对自己造成伤害
@@ -227,7 +232,7 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 		//获取本地玩家控制器
 		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
 		{
-			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
 	}
 }

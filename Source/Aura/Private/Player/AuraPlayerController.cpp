@@ -85,7 +85,7 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	AutoRun();
 }
 
-void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
 	if (IsValid(TargetCharacter) && DamageTextComponentClass)
 	{
@@ -98,7 +98,7 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, 
 		//伤害文本和目标角色分离，不跟随角色移动
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		//设置伤害文本
-		DamageText->SetDamageText(DamageAmount);
+		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 	}
 }
 

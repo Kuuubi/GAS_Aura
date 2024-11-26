@@ -250,5 +250,5 @@ private:
 	//获取效果的来源和目标
 	void SetFEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 	//显示浮动文本
-	void ShowFloatingText(const FEffectProperties& Props, float Damage) const;
+	void ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const;
 };

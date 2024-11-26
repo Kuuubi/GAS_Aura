@@ -58,6 +58,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 
+	//伤害计算系数曲线表
+	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
+	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
+	
 	//通过职业枚举获取对应的主要属性
 	FCharacterClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass);
 	
