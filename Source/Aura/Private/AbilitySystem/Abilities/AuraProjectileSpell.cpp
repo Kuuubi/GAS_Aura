@@ -33,7 +33,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		//火球生成的位置向量减去目标位置向量得到旋转就是要朝哪边飞的方向
 		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 		//旋转俯仰角
-		Rotation.Pitch = 0.f;
+		//Rotation.Pitch = 0.f;
 
 		//设置生成火球的位置
 		FTransform SpawnTransform;

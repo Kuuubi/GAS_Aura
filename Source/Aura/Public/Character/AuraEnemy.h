@@ -10,6 +10,8 @@
 #include "AuraEnemy.generated.h"
 
 class UWidgetComponent;
+class UBehaviorTree;
+class AAuraAIController;
 /**
  * 
  */
@@ -20,6 +22,8 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
 public:
 	//碰撞预设
 	AAuraEnemy();
+	//Pawn被控制器控制时触发回调
+	virtual void PossessedBy(AController* NewController) override;
 
 	/** Enemy Interface */
 	//高亮Actor
@@ -76,5 +80,13 @@ protected:
 	//血量条
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+
+	//行为树
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	//AI控制器
+	UPROPERTY()
+	TObjectPtr<AAuraAIController> AuraAIController;
 	
 };

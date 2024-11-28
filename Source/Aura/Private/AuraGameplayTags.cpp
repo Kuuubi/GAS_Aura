@@ -129,13 +129,13 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	FString("雷属性抗性")
 	);
 	
-	GameplayTags.Attributes_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Attributes.Resistance.Physical"),
+	GameplayTags.Attributes_Resistance_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Attributes.Resistance.Arcane"),
 	FString("魔法抗性")
 	);
 	
-	GameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Damage.Physical"),
+	GameplayTags.Attributes_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Attributes.Resistance.Physical"),
 	FString("物理抗性")
 	);
 	

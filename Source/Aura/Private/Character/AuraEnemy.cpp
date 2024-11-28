@@ -7,7 +7,10 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AI/AuraAIController.h"
 #include "Aura/Aura.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/Widget/AuraUserWidget.h"
@@ -31,6 +34,21 @@ AAuraEnemy::AAuraEnemy()
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	//添加到根组件
 	HealthBar->SetupAttachment(GetRootComponent());
+}
+
+void AAuraEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	//AI角色只会由服务器控制，所以AIController只会在服务器端执行的
+	if (!HasAuthority()) return;
+	//AI控制器转换成AuraAIController
+	AuraAIController = Cast<AAuraAIController>(NewController);
+
+	//初始化行为树上设置的黑板
+	AuraAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	//运行行为树
+	AuraAIController->RunBehaviorTree(BehaviorTree);
 }
 
 void AAuraEnemy::HighlightActoer()
@@ -76,10 +94,14 @@ void AAuraEnemy::BeginPlay()
 	Super::BeginPlay();
 	//设置移动速度
 	GetCharacterMovement()->MaxWalkSpeed =  BaseWalkSpeed;
-	//初始化
+	//初始化ActorInfo
 	InitAbilityActorInfo();
-	//赋予初始GA
-	UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	
+	if (HasAuthority())
+	{
+		//赋予初始GA
+		UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	}
 	
 	
 	//设置Widget控制器
@@ -124,8 +146,12 @@ void AAuraEnemy::InitAbilityActorInfo()
 	//转换初始化完成后调用函数
 	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
-	//初始化属性
-	InitializeDefaultAttribute();
+	if (HasAuthority())
+	{
+		//初始化属性
+		InitializeDefaultAttribute();
+	}
+
 }
 
 void AAuraEnemy::InitializeDefaultAttribute() const

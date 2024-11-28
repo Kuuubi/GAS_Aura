@@ -30,7 +30,7 @@ public:
 	FAttributeInfoSignature AttributeInfoDelegate;
 
 protected:
-	//属性信息
+	//属性信息数据资产
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAttributeInfo> AttributeInfo;
 
