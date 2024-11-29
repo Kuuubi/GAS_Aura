@@ -50,9 +50,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void OnEndOverlap(AActor* TargetActor);
 	
-	//销毁移除效果actor布尔
+	//即时和持续的GE在应用后，此Actor是否需要被销毁
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Applied Effects")
-	bool bDestroyOnEffectRemoval = false;
+	bool bDestroyOnEffectApplication = false;
+
+	//是否对敌人应用GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Applied Effects")
+	bool bApplyEffectsToEnemies = false;
 	
 	//即使效果
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Applied Effects")

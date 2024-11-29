@@ -176,10 +176,14 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 						//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Orange, false, 5.f);
 					}
-					//将路径最后一个点位设置成目的地
-					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
-					//自动寻路
-					bAutoRunning = true;
+					if (NavPath->PathPoints.Num() > 0)
+					{
+						//将路径最后一个点位设置成目的地
+						CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+						//自动寻路
+						bAutoRunning = true;
+					}
+
 				}
 			}
 			//重置长按时间

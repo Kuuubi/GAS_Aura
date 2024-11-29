@@ -35,7 +35,10 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 	 ASCInterface->GetAbilitySystemComponent();
 	 }
 	 */
-
+	
+	//判断是否带敌人标签
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	//获取ASC方法二
 	//通过使用静态函数库，就像static_math数学库以及像那样的静态函数库
 	//称为UAbilitySystemBlueprintLibrary
@@ -64,11 +67,20 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 		//添加键值对
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
+	//除了无限效果，如果应用时销毁为true
+	else if (bDestroyOnEffectApplication)
+	{
+		//效果在应用时销毁Actor
+		Destroy();
+	}
 }
 
 //开始重叠函数
 void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 {
+	//判断是否带敌人标签
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	//即时效果应用策略
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
@@ -89,6 +101,9 @@ void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 //结束重叠函数
 void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	//判断是否带敌人标签
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	if(InstantEffectApplicationPolicy  == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
 		ApplyEffectToTarget(TargetActor , InstantGameplayEffectClass);
