@@ -27,9 +27,14 @@ struct FCharacterClassDefaultInfo
 {
 	GENERATED_BODY()
 
-	//单独的主要属性
+	//特定的主要属性
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+
+	//特定的GA
+	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
 };
 
 /**

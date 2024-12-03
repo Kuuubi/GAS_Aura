@@ -13,7 +13,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	//游戏标签管理器添加Native标签
 
 	/* 主要属性 */
-	
 	GameplayTags.Attributes_Primary_Strength = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Primary.Strength"),
 		FString("提高物理伤害")
@@ -35,7 +34,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		);
 	
 	/* 次要属性 */
-	
 	GameplayTags.Attributes_Secondary_Armor = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.Armor"),
 		FString("减少受到的伤害，提高格挡几率")
@@ -87,7 +85,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		);
 
 	/* 输入标签 */
-	
 	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.LMB"),
 		FString("鼠标左键")
@@ -141,7 +138,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	
 
 	/* 伤害类型标签 */
-	
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Damage"),
 	FString("造成伤害")
@@ -167,16 +163,35 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	FString("造成物理伤害")
 	);
 
-	//伤害类型对应抗性
+	/* 伤害类型对应抗性 */
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Fire, GameplayTags.Attributes_Resistance_Fire);
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Lightning, GameplayTags.Attributes_Resistance_Lightning);
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Arcane, GameplayTags.Attributes_Resistance_Arcane);
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Physical, GameplayTags.Attributes_Resistance_Physical);
 
-	/* 受击标签 */
+	/* 能力标签 */
+	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Attack"),
+	FString("攻击能力")
+	);
 	
+	/* 受击标签 */
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Effects.HitReact"),
 	FString("受到攻击")
+	);
+
+	/* 敌人攻击方式标签 */
+	GameplayTags.Montage_Attack_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Montage.Attack.Weapon"),
+	FString("武器攻击")
+	);
+	GameplayTags.Montage_Attack_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Montage.Attack.LeftHand"),
+	FString("左手攻击")
+	);
+	GameplayTags.Montage_Attack_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Montage.Attack.RightHand"),
+	FString("右手攻击")
 	);
 }

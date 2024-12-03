@@ -25,5 +25,13 @@ public:
 	//高亮Actor
 	virtual void HighlightActoer() = 0;
 	//取消高亮
-	virtual void UnHighlightActoer() = 0; 
+	virtual void UnHighlightActoer() = 0;
+
+	//设置攻击目标
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetCombatTarget(AActor* InCombatTarget);
+
+	//获取攻击目标
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AActor* GetCombatTarget() const;
 };

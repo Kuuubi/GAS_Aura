@@ -68,14 +68,31 @@ public:
 	FGameplayTag Damage_Lightning;
 	FGameplayTag Damage_Arcane;
 	FGameplayTag Damage_Physical;
-
-	//伤害类型对应抗性
+	
+	/*
+	* 伤害类型对应抗性
+	*/
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+
+	/*
+	* 能力标签
+	*/
+	FGameplayTag Abilities_Attack;
 
 	/*
 	* 受击标签
 	*/
 	FGameplayTag Effects_HitReact;
+
+	/*
+	* 敌人攻击方式标签
+	*/
+	//使用武器攻击蒙太奇标签
+	FGameplayTag Montage_Attack_Weapon;
+	//左手攻击蒙太奇标签
+	FGameplayTag Montage_Attack_LeftHand;
+	//右手攻击蒙太奇标签
+	FGameplayTag Montage_Attack_RightHand;
 
 private:
 	//静态成员变量

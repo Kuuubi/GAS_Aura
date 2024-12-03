@@ -4,6 +4,7 @@
 #include "Character/AuraCharacterBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
@@ -25,7 +26,7 @@ AAuraCharacterBase::AAuraCharacterBase()
 
 	//创建武器骨骼网络组件
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
-	//添加武器网格插槽
+	//武器网格体附加到人物武器骨骼位置
 	Weapon->SetupAttachment(GetMesh(),FName("WeaponHandSocket"));
 	//武器没有任何碰撞
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -69,6 +70,8 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 
 	//溶解材质
 	Dissolve();
+	//角色是否死亡
+	bDead = true;
 }
 
 void AAuraCharacterBase::BeginPlay()
@@ -77,11 +80,38 @@ void AAuraCharacterBase::BeginPlay()
 	
 }
 
-//返回施法骨骼插槽位置
-FVector AAuraCharacterBase::GetCombatSocketLocation()
+//返回攻击方式骨骼插槽位置
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	check(Weapon)
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon))
+	{
+		return Weapon->GetSocketLocation(WeaponTipSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
+	{
+		return GetMesh()->GetSocketLocation(LeftHandTipSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
+	{
+		return GetMesh()->GetSocketLocation(RightHandTipSocketName);
+	}
+	return FVector();
+}
+
+bool AAuraCharacterBase::IsDead_Implementation()
+{
+	return bDead;
+}
+
+AActor* AAuraCharacterBase::GetAvatar_Implementation()
+{
+	return this;;
+}
+
+TArray<FTaggedMontage> AAuraCharacterBase::GetAttackMontages_Implementation()
+{
+	return AttackMontages;
 }
 
 

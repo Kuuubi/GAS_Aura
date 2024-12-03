@@ -26,29 +26,54 @@ public:
 	//GetAS
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; };
 
+	/** Combat Interface */
 	//获取受击反应蒙太奇动画
 	virtual  UAnimMontage* GetHitReactMontage_Implementation() override;
 
 	//角色死亡
 	virtual void Die() override;
+	
+	//获取生成火球的骨骼插槽位置
+	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 
+	//判断角色死亡
+	virtual bool IsDead_Implementation() override;
+	//获取Avatar
+	virtual AActor* GetAvatar_Implementation() override;
+
+	//获取攻击方式蒙太奇数组
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+	/** end Combat Interface */
+	
 	//多播死亡
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
+	//攻击方式蒙太奇数组
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TArray<FTaggedMontage> AttackMontages;
+
 protected:
 	virtual void BeginPlay() override;
 
-	//属性说明符
-	UPROPERTY(EditAnywhere, Category="Combat")
-	//名为Weapon的骨骼网格组件
+	//Weapon骨骼网格组件
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	//用于施法的骨骼插槽
+	//用于武器攻击的骨骼插槽
 	UPROPERTY(EditAnywhere, Category="Combat")
 	FName WeaponTipSocketName;
-	//获取生成火球的骨骼插槽位置
-	virtual FVector GetCombatSocketLocation() override;
+
+	//用于左手攻击的骨骼插槽
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName LeftHandTipSocketName;
+
+	//用于右手攻击的骨骼插槽
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName RightHandTipSocketName;
+	
+	//角色是否死亡
+	bool bDead = false;
 
 	UPROPERTY()
 	//技能系统组件

@@ -28,8 +28,11 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	if (CombatInterface)
 	{
 		//获取要发射火球的骨骼插槽位置
-		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
-
+		const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(
+			GetAvatarActorFromActorInfo(),
+			FAuraGameplayTags::Get().Montage_Attack_Weapon
+			 );
+		
 		//火球生成的位置向量减去目标位置向量得到旋转就是要朝哪边飞的方向
 		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 		//旋转俯仰角

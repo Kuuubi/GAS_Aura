@@ -30,6 +30,10 @@ public:
 	virtual void HighlightActoer() override;
 	//取消高亮
 	virtual void UnHighlightActoer() override;
+	//设置敌人目标
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	//获取敌人目标
+	virtual AActor* GetCombatTarget_Implementation() const override;
 	/** end Enemy Interface */
 
 	/** Combat Interface */
@@ -53,13 +57,16 @@ public:
 	bool bHitReacting = false;
 
 	//设置移动速度
-	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	float BaseWalkSpeed = 250.f;
 
 	//设置死亡后存在时间
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	float LifeSpan = 5.f;
 
+	//战斗目标
+	UPROPERTY(BlueprintReadWrite, Category="Combat")
+	TObjectPtr<AActor> CombatTarget;
 protected:
 	virtual  void BeginPlay() override;
 	

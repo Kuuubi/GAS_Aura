@@ -5,6 +5,7 @@
 
 #include "AuraAbilityTypes.h"
 #include "Game/AuraGameModeBase.h"
+#include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "Player/AuraPlayerState.h"
@@ -90,16 +91,33 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	
 }
 
-void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	//通过游戏模式获取设置的数据资产
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	if (CharacterClassInfo == nullptr) return;
 	for (TSubclassOf<UGameplayAbility> AbilityClass :  CharacterClassInfo->CommonAbilities)
 	{
 		//创建能力Spec
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		//赋予能力
 		ASC->GiveAbility(AbilitySpec);
+	}
+	
+	//不同职业赋予特定GA
+	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
+	{
+		//获取战斗接口
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		{
+			//获取玩家等级
+			int32 PlayerLevel = CombatInterface->GetPlayerLevel();
+			//创建能力Spec
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, PlayerLevel);
+			//赋予能力
+			ASC->GiveAbility(AbilitySpec);
+		}
 	}
 }
 
@@ -147,4 +165,42 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& E
 	{
 		AuraEffectContext->SetIsCriticalHit(bInIsCriticalHit);
 	}
+}
+
+void UAuraAbilitySystemLibrary::GetLivePlayerWithnRadius(const UObject* WorldContextObject,
+	TArray<AActor*>& OutOverlappingActors,const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin)
+{
+	//创建碰撞查询的配置
+	FCollisionQueryParams SphereParams;
+	//添加要忽略的Actor数组
+	SphereParams.AddIgnoredActors(ActorsToIgnore);
+	
+	//创建重叠结果数组
+	TArray<FOverlapResult> Overlaps;
+	//获取当前所处的场景，如果获取失败，将打印并返回Null
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		//获取到所有与此球体碰撞的动态Actor
+		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(Radius), SphereParams);
+		//遍历所有获取到的动态Actor
+		for (FOverlapResult& Overlap : Overlaps)
+		{
+			//判断该Actor是否实现战斗接口
+			const bool ImplementsCombatInterface = Overlap.GetActor()->Implements<UCombatInterface>();
+			//判断该Actor是否存活，如果未实现战斗接口将不会判断
+			if (ImplementsCombatInterface && !ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			{
+				//将Actor添加到返回数组，AddUnique 只有在此Actor未被添加时，才可以添加到数组
+				OutOverlappingActors.AddUnique(Overlap.GetActor());
+			}
+		}
+	}
+}
+
+bool UAuraAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondActor)
+{
+	const bool bBothArePlayers = FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"));
+	const bool bBothAreEnemies = FirstActor->ActorHasTag(FName("Enemy")) && SecondActor->ActorHasTag(FName("Enemy"));
+	const bool bFriends = bBothArePlayers || bBothAreEnemies;
+	return !bFriends;
 }
