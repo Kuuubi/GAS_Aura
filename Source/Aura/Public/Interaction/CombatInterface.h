@@ -7,7 +7,10 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
-//攻击蒙太奇，攻击方式标签，骨骼插槽结构体
+class UNiagaraSystem;
+class UAnimMontage;
+
+//攻击方式结构体
 USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
@@ -17,9 +20,17 @@ struct FTaggedMontage
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UAnimMontage* Montage = nullptr;
 
-	//攻击方式标签
+	//攻击动作标签
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag MontageTag;
+
+	//攻击部位标签
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag SocketTag;;
+
+	//击中音效
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USoundBase* ImpactSound = nullptr;
 
 	//攻击时触发伤害的骨骼插槽
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -33,7 +44,7 @@ class UCombatInterface : public UInterface
 	GENERATED_BODY()
 };
 
-class UAnimMontage;
+
 
 /**
  * 
@@ -73,4 +84,13 @@ public:
 	//获取攻击方式蒙太奇数组
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	TArray<FTaggedMontage> GetAttackMontages();
+
+	//获取溅血奶瓜特效
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UNiagaraSystem* GetBloodEffect();
+
+	//根据攻击动作标签获取攻击方式结构体
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+	
 };

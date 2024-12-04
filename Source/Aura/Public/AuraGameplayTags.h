@@ -85,14 +85,20 @@ public:
 	FGameplayTag Effects_HitReact;
 
 	/*
-	* 敌人攻击方式标签
+	* 攻击方式标签
 	*/
-	//使用武器攻击蒙太奇标签
-	FGameplayTag Montage_Attack_Weapon;
-	//左手攻击蒙太奇标签
-	FGameplayTag Montage_Attack_LeftHand;
-	//右手攻击蒙太奇标签
-	FGameplayTag Montage_Attack_RightHand;
+	//使用武器攻击部位标签
+	FGameplayTag CombatSocket_Weapon;
+	//左手攻击部位标签
+	FGameplayTag CombatSocket_LeftHand;
+	//右手攻击部位标签
+	FGameplayTag CombatSocket_RightHand;
+
+	//攻击动作索引标签
+	FGameplayTag Montage_Attack_1;;
+	FGameplayTag Montage_Attack_2;;
+	FGameplayTag Montage_Attack_3;;
+	FGameplayTag Montage_Attack_4;;
 
 private:
 	//静态成员变量

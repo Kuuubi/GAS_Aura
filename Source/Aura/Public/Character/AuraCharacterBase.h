@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UGameplayAbility;
 class UGameplayEffect;
 class UAbilitySystemComponent;
@@ -43,13 +44,19 @@ public:
 
 	//获取攻击方式蒙太奇数组
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
+
+	//获取溅血特效
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
+
+	//根据标签获取攻击方式结构体
+	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	/** end Combat Interface */
 	
 	//多播死亡
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
-	//攻击方式蒙太奇数组
+	//攻击方式结构体数组
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TArray<FTaggedMontage> AttackMontages;
 
@@ -116,12 +123,16 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
 	
-	//创建材质实例
+	//角色溶解材质实例
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
-
+	//武器溶解材质实例
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	//溅血奶瓜特效
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UNiagaraSystem* BloodEffect;
 
 private:
 

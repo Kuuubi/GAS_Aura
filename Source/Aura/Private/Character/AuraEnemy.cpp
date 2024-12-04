@@ -100,6 +100,8 @@ void AAuraEnemy::Die()
 {
 	//到时间后会将角色销毁
 	SetLifeSpan(LifeSpan);
+	//设置Dead黑板键布尔值
+	if (AuraAIController) AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 	Super::Die();
 }
 
