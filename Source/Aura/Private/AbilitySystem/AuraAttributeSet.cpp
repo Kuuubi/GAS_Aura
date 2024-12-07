@@ -119,7 +119,7 @@ void UAuraAttributeSet::SetFEffectProperties(const FGameplayEffectModCallbackDat
 	//EffectSpec
 	Props.EffectContextHandle  = Data.EffectSpec.GetContext();
 	
-	//调用获取原始函数，获取来源的ASC
+	//调用获取Original函数，获取来源的ASC
 	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
 	
 	//访问控制器

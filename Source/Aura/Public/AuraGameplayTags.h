@@ -78,6 +78,7 @@ public:
 	* 能力标签
 	*/
 	FGameplayTag Abilities_Attack;
+	FGameplayTag Abilities_Summon;
 
 	/*
 	* 受击标签
@@ -93,6 +94,8 @@ public:
 	FGameplayTag CombatSocket_LeftHand;
 	//右手攻击部位标签
 	FGameplayTag CombatSocket_RightHand;
+	//尾巴攻击部位标签
+	FGameplayTag CombatSocket_Tail;
 
 	//攻击动作索引标签
 	FGameplayTag Montage_Attack_1;;

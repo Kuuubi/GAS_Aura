@@ -17,7 +17,7 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 }
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
 {
 	//检查权威
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
@@ -30,14 +30,17 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		//获取要发射火球的骨骼插槽位置
 		const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(
 			GetAvatarActorFromActorInfo(),
-			FAuraGameplayTags::Get().CombatSocket_Weapon
-			 );
+			SocketTag
+			);
 		
 		//火球生成的位置向量减去目标位置向量得到旋转就是要朝哪边飞的方向
 		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 		//旋转俯仰角
-		//Rotation.Pitch = 0.f;
-
+		if (bOverridePitch)
+		{
+			Rotation.Pitch = PitchOverride;
+		}
+		
 		//设置生成火球的位置
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);

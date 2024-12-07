@@ -174,6 +174,11 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	FName("Abilities.Attack"),
 	FString("攻击能力")
 	);
+	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Summon"),
+	FString("召唤能力")
+	);
+	
 	
 	/* 受击标签 */
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -193,6 +198,10 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("CombatSocket.RightHand"),
 	FString("右手攻击")
+	);
+	GameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("CombatSocket.Tail"),
+	FString("尾巴攻击")
 	);
 
 	/* 攻击动作索引标签 */

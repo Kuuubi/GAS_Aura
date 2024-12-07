@@ -92,5 +92,13 @@ public:
 	//根据攻击动作标签获取攻击方式结构体
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+
+	//获取召唤物数量计数
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetMinionCount();
+
+	//召唤物数量计数增加
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void IncremenetMinionCount(int32 Amount);
 	
 };

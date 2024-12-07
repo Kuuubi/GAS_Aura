@@ -9,6 +9,7 @@
 
 class AAuraProjectile;
 class UGameplayEffect;
+struct FGameplayTag;
 /**
  * 
  */
@@ -22,7 +23,7 @@ protected:
 
 	//生成抛射物
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	void SpawnProjectile(const FVector& ProjectileTargetLocation);
+	void SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch = false, float PitchOverride = 0.f);
 	
 	//蓝图类中设置要生成的火球类
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

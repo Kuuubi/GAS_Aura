@@ -59,7 +59,8 @@ void AAuraCharacter::InitAbilityActorInfo()
 {
 	//初始化ability  actor info
 	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
-	check((AuraPlayerState));
+	check(AuraPlayerState);
+	//设置玩家状态为OwnerActor
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState,this);
 	//转换初始化完成后调用函数
 	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();

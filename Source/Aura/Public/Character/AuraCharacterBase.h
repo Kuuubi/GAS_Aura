@@ -50,6 +50,12 @@ public:
 
 	//根据标签获取攻击方式结构体
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+
+	//获取召唤物数量计数
+	virtual int32 GetMinionCount_Implementation() override;
+
+	//召唤物数量计数增加
+	virtual void IncremenetMinionCount_Implementation(int32 Amount) override;
 	/** end Combat Interface */
 	
 	//多播死亡
@@ -78,6 +84,10 @@ protected:
 	//用于右手攻击的骨骼插槽
 	UPROPERTY(EditAnywhere, Category="Combat")
 	FName RightHandTipSocketName;
+
+	//用于尾巴攻击的骨骼插槽
+	UPROPERTY(EditAnywhere, Category="Combat")
+	FName TailTipSocketName;
 	
 	//角色是否死亡
 	bool bDead = false;
@@ -131,8 +141,17 @@ protected:
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 
 	//溅血奶瓜特效
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	UNiagaraSystem* BloodEffect;
+
+	//死亡音效
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	USoundBase* DeathSound;
+
+	/* 召唤 */
+	//召唤物数量计数
+	int32 MinionCount = 0;
+	
 
 private:
 
