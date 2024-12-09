@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 //广播初始值函数
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -60,8 +61,22 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		}
 	);
 
-	//调用广播AssetTags
-	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		//拥有技能委托
+		if (AuraASC->bStartupAbilitiesGiven)
+		{
+			//调用初始化拥有的技能回调
+			OnInitializeStartupAbilities(AuraASC);
+		}
+		else
+		{
+			//如果技能还未完成初始化，通过绑定委托，监听广播
+			AuraASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartupAbilities);
+		}
+		
+		//AssetTags委托
+		AuraASC->EffectAssetTags.AddLambda(
 			[this](const FGameplayTagContainer& AssetTags)
 			{	
 				//循环
@@ -78,5 +93,26 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 					}
 				}
 			}
-	);
+		);
+	}
+}
+
+void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent)
+{
+	if (!AuraAbilitySystemComponent->bStartupAbilitiesGiven) return;
+
+	//创建单播委托
+	FForEachAbility BroadcastDelegate;
+	//委托绑定回调匿名函数，委托广播时将会触发函数内部逻辑
+	BroadcastDelegate.BindLambda([this, AuraAbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		//查找技能标签
+		FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AuraAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
+		//查找输入标签
+		Info.InputTag = AuraAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
+		//广播技能信息数据
+		AbilityInfoDelegate.Broadcast(Info);
+	});
+	//遍历技能并触发委托回调
+	AuraAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
 }

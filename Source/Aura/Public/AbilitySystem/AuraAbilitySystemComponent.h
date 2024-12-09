@@ -8,6 +8,9 @@
 
 //声明多播委托Tag
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* AssetTags*/)
+//拥有的技能
+DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGiven, UAuraAbilitySystemComponent*);
+DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
 
 
 /**
@@ -22,18 +25,34 @@ public:
 	//AbilityActorInfo初始化完成后调用
 	void AbilityActorInfoSet();
 
-	//公开广播Tag
+	//创建AssetTags委托
 	FEffectAssetTags EffectAssetTags;
+	///创建拥有的技能委托
+	FAbilitiesGiven AbilitiesGivenDelegate;
 
 	//添加角色能力
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+
+	//角色能力是否添加完毕
+	bool bStartupAbilitiesGiven = false;
 
 	//按键释放时
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	//按键按下时
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
+	//遍历可激活技能
+	void ForEachAbility(const FForEachAbility& Delegate);
+	
+	//通过Spec获取Abilities标签
+	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	//通过Spec获取Input标签
+	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
 protected:
+
+	//客户端广播拥有技能
+	virtual void OnRep_ActivateAbilities() override;
+	
 	//效果应用回调函数
 	UFUNCTION(Client, Reliable)
 	void ClientEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);

@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
-class UAuraUserWidget;
 
 //UI组件数据表结构
 USTRUCT(BlueprintType)
@@ -33,12 +33,17 @@ struct FUIWidgetRow : public FTableRowBase
 	
 };
 
+class UAbilityInfo;
+class UAuraUserWidget;
+class UAuraAbilitySystemComponent;
+
 //声明代理类型，即委托签名
 //属性
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float , NewValue);
-
 //消息组件表行
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow , Row);
+//技能信息数据
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfo, Info);
 
 
 
@@ -73,17 +78,28 @@ public:
 	FOnAttributeChangedSignature OnMaxManaChanged;
 
 	//消息组件表行委托
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
+
+	//技能信息数据
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FAbilityInfoSignature AbilityInfoDelegate;
 
 protected:
 	//设置消息组件数据表
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
 
+	//设置技能数据资产
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
 	//查找数据表
 	template<typename  T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
+
+	//初始化拥有的技能回调
+	void OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
 };
 
 //查找数据表

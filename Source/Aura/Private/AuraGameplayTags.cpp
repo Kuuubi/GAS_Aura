@@ -117,51 +117,51 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 
 	/* 属性抗性标签 */
 	GameplayTags.Attributes_Resistance_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Attributes.Resistance.Fire"),
-	FString("火属性抗性")
-	);
+		FName("Attributes.Resistance.Fire"),
+		FString("火属性抗性")
+		);
 
 	GameplayTags.Attributes_Resistance_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Attributes.Resistance.Lightning"),
-	FString("雷属性抗性")
-	);
+		FName("Attributes.Resistance.Lightning"),
+		FString("雷属性抗性")
+		);
 	
 	GameplayTags.Attributes_Resistance_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Attributes.Resistance.Arcane"),
-	FString("魔法抗性")
-	);
+		FName("Attributes.Resistance.Arcane"),
+		FString("魔法抗性")
+		);
 	
 	GameplayTags.Attributes_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Attributes.Resistance.Physical"),
-	FString("物理抗性")
-	);
+		FName("Attributes.Resistance.Physical"),
+		FString("物理抗性")
+		);
 	
 
 	/* 伤害类型标签 */
-	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Damage"),
-	FString("造成伤害")
-	);
+		GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage"),
+		FString("造成伤害")
+		);
 	
 	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Damage.Fire"),
-	FString("造成火属性伤害")
-	);
+		FName("Damage.Fire"),
+		FString("造成火属性伤害")
+		);
 
 	GameplayTags.Damage_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Damage.Lightning"),
-	FString("造成雷属性伤害")
-	);
+		FName("Damage.Lightning"),
+		FString("造成雷属性伤害")
+		);
 	
 	GameplayTags.Damage_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Damage.Arcane"),
-	FString("造成魔法伤害")
-	);
+		FName("Damage.Arcane"),
+		FString("造成魔法伤害")
+		);
 	
 	GameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Damage.Physical"),
-	FString("造成物理伤害")
-	);
+		FName("Damage.Physical"),
+		FString("造成物理伤害")
+		);
 
 	/* 伤害类型对应抗性 */
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Fire, GameplayTags.Attributes_Resistance_Fire);
@@ -171,54 +171,59 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 
 	/* 能力标签 */
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Abilities.Attack"),
-	FString("攻击能力")
-	);
+		FName("Abilities.Attack"),
+		FString("攻击能力")
+		);
 	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Abilities.Summon"),
-	FString("召唤能力")
-	);
+		FName("Abilities.Summon"),
+		FString("召唤能力")
+		);
+
+	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Fire.FireBolt"),
+		FString("发射火球")
+		);
 	
 	
 	/* 受击标签 */
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Effects.HitReact"),
-	FString("受到攻击")
-	);
+		FName("Effects.HitReact"),
+		FString("受到攻击")
+		);
 
 	/* 攻击部位标签 */
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("CombatSocket.Weapon"),
-	FString("武器攻击")
-	);
+		FName("CombatSocket.Weapon"),
+		FString("武器攻击")
+		);
 	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("CombatSocket.LeftHand"),
-	FString("左手攻击")
-	);
+		FName("CombatSocket.LeftHand"),
+		FString("左手攻击")
+		);
 	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("CombatSocket.RightHand"),
-	FString("右手攻击")
-	);
+		FName("CombatSocket.RightHand"),
+		FString("右手攻击")
+		);
 	GameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("CombatSocket.Tail"),
-	FString("尾巴攻击")
-	);
+		FName("CombatSocket.Tail"),
+		FString("尾巴攻击")
+		);
 
 	/* 攻击动作索引标签 */
 	GameplayTags.Montage_Attack_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Montage.Attack.1"),
-	FString("攻击动作索引1")
-	);
+		FName("Montage.Attack.1"),
+		FString("攻击动作索引1")
+		);
 	GameplayTags.Montage_Attack_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Montage.Attack.2"),
-	FString("攻击动作索引2")
-	);
+		FName("Montage.Attack.2"),
+		FString("攻击动作索引2")
+		);
 	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-    FName("Montage.Attack.3"),
-    FString("攻击动作索引3")
-    );
+   		FName("Montage.Attack.3"),
+   		FString("攻击动作索引3")
+   		);
 	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Montage.Attack.4"),
-	FString("攻击动作索引4")
-	);
+		FName("Montage.Attack.4"),
+		FString("攻击动作索引4")
+		);
 }
