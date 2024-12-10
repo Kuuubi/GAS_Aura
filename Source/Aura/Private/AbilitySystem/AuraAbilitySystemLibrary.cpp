@@ -167,7 +167,7 @@ void UAuraAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& E
 	}
 }
 
-void UAuraAbilitySystemLibrary::GetLivePlayerWithnRadius(const UObject* WorldContextObject,
+void UAuraAbilitySystemLibrary::GetLivePlayerWithRadius(const UObject* WorldContextObject,
 	TArray<AActor*>& OutOverlappingActors,const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin)
 {
 	//创建碰撞查询的配置

@@ -184,6 +184,12 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("发射火球")
 		);
 	
+	/* 冷却标签 */
+	GameplayTags.Cooldown_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Fire.FireBolt"),
+		FString("火球术冷却")
+		);
+	
 	
 	/* 受击标签 */
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(

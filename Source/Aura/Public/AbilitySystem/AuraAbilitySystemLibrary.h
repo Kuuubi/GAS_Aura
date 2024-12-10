@@ -58,7 +58,7 @@ public:
 
 	//获取一定半径范围内所有在线的玩家
 	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayMechanics ")
-	static void GetLivePlayerWithnRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin);
+	static void GetLivePlayerWithRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin);
 
 	//判断不是队友
 	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayMechanics ")

@@ -79,8 +79,13 @@ public:
 	*/
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
-	
+	//技能
 	FGameplayTag Abilities_Fire_FireBolt;
+
+	/*
+	* 冷却标签
+	*/
+	FGameplayTag Cooldown_Fire_FireBolt;
 
 	/*
 	* 受击标签

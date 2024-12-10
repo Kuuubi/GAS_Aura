@@ -16,6 +16,10 @@ struct FAuraAbilityInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag AbilityTag = FGameplayTag();
 
+	//冷却标签
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag CooldownTag= FGameplayTag();
+
 	//输入映射标签
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag InputTag = FGameplayTag();

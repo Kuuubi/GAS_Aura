@@ -17,7 +17,7 @@ void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 //添加角色能力
 void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
-	//循环为每个StartupAbilities调用AbilityClass
+	//遍历StartupAbilities
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
 	{
 		
