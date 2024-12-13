@@ -187,8 +187,10 @@ void AAuraCharacterBase::AddCharacterAbilities()
 	//检查权威
 	if (!HasAuthority()) return;
 
-	//添加能力列表
+	//添加主动能力列表
 	AuraASC->AddCharacterAbilities(StartupAbilities);
+	//添加被动能力列表
+	AuraASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void AAuraCharacterBase::Dissolve()

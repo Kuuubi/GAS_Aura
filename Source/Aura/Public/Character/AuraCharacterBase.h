@@ -162,9 +162,13 @@ protected:
 
 private:
 
-	//能力列表
+	//主动能力列表
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	//被动能力列表
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
 	//设置受击反应蒙太奇动画
 	UPROPERTY(EditAnywhere, Category="Combat")

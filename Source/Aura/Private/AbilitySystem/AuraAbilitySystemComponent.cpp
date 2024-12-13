@@ -14,7 +14,7 @@ void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 	
 }
 
-//添加角色能力
+//赋予角色主动能力
 void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
 	//遍历StartupAbilities
@@ -38,6 +38,21 @@ void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 	bStartupAbilitiesGiven = true;
 	//广播拥有的技能
 	AbilitiesGivenDelegate.Broadcast(this);
+}
+
+void UAuraAbilitySystemComponent::AddCharacterPassiveAbilities(
+	const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities)
+{
+	//遍历StartupAbilities
+    	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupPassiveAbilities)
+    	{
+    		
+    		//创建能力Spec
+    		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+
+    		//赋予能力并立即激活一次
+    		GiveAbilityAndActivateOnce(AbilitySpec);
+    	}
 }
 
 //按键按下

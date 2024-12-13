@@ -30,8 +30,11 @@ public:
 	///创建拥有的技能委托
 	FAbilitiesGiven AbilitiesGivenDelegate;
 
-	//添加角色能力
+	//赋予角色主动能力
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+
+	//赋予角色被动能力
+	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities);
 
 	//角色能力是否添加完毕
 	bool bStartupAbilitiesGiven = false;

@@ -214,7 +214,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
-	
+
+	//传入XP元属性
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingXP;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingXP);
 	
 
 //GE预测旧值
@@ -284,6 +288,10 @@ private:
 	//设置属性影响结构体函数
 	//获取效果的来源和目标
 	void SetFEffectProperties(const struct FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
+	
 	//显示浮动文本
 	void ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const;
+	
+	//发送经验事件
+	void SendXPEvent(const FEffectProperties& Props);
 };

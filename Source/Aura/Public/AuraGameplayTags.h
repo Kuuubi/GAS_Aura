@@ -51,6 +51,11 @@ public:
 	FGameplayTag Attributes_Resistance_Physical;
 
 	/*
+	* 元属性标签
+	*/
+	FGameplayTag Attributes_Meta_IncomingXP;
+
+	/*
 	* 输入标签
 	*/
 	FGameplayTag InputTag_LMB;

@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Aura/AuraLogChannels.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
@@ -197,7 +198,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
 		SetIncomingDamage(0.f);
-		//执行计算
+		//伤害计算
 		if (LocalIncomingDamage > 0.f)
 		{
 			//修改血量
@@ -214,6 +215,8 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 				{
 					CombatInterface->Die();
 				}
+				//发送经验事件
+				SendXPEvent(Props);
 			}
 			else
 			{
@@ -235,6 +238,14 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 			}
 		}
 	}
+
+	//传入XP元属性
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		const float LocalIncomingXP = GetIncomingXP();
+		SetIncomingXP(0.f);
+		UE_LOG(LogAura, Log, TEXT("传入XP：%f"), LocalIncomingXP);
+	}
 	
 }
 
@@ -254,6 +265,33 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 		{
 			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
+	}
+}
+
+void UAuraAttributeSet::SendXPEvent(const FEffectProperties& Props)
+{
+	//获取目标Combat接口
+	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetCharacter))
+	{
+		//获取目标等级
+		const int32 TargetLevel = CombatInterface->GetPlayerLevel();
+		//获取目标职业
+		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
+		//获取经验奖励值
+		const int32 XPReward = UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
+
+		//标签
+		const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+		//Payload，要发送的数据
+		FGameplayEventData Payload;
+		Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
+		Payload.EventMagnitude = XPReward;
+		//发送经验事件
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			Props.SourceCharacter,
+			GameplayTags.Attributes_Meta_IncomingXP,
+			Payload
+			);
 	}
 }
 
