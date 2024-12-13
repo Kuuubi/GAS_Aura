@@ -63,4 +63,8 @@ public:
 	//判断不是队友
 	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayMechanics ")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
+
+	//通过敌人等级获取经验奖励值
+	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | CharacterClassDefaults ")
+	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
 };

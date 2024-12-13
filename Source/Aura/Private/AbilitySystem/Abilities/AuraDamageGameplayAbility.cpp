@@ -13,6 +13,7 @@ void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	//循环曲线表，通过SetByCaller设置属性伤害值
 	for (TTuple<FGameplayTag, FScalableFloat> Pair : DamageTypes)
 	{
+		//根据等级获取技能伤害
 		const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, ScaledDamage);
 	}

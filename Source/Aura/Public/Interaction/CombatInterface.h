@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
+#include  "AbilitySystem/Data/CharacterClassInfo.h"
 #include "CombatInterface.generated.h"
 
 class UNiagaraSystem;
@@ -100,5 +101,8 @@ public:
 	//召唤物数量计数增加
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void IncremenetMinionCount(int32 Amount);
-	
+
+	//获取敌人职业类型
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ECharacterClass GetCharacterClass();
 };

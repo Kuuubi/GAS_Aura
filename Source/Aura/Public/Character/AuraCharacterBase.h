@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
@@ -56,6 +57,9 @@ public:
 
 	//召唤物数量计数增加
 	virtual void IncremenetMinionCount_Implementation(int32 Amount) override;
+
+	//获取职业类型
+	virtual ECharacterClass GetCharacterClass_Implementation() override;
 	/** end Combat Interface */
 	
 	//多播死亡
@@ -151,7 +155,10 @@ protected:
 	/* 召唤 */
 	//召唤物数量计数
 	int32 MinionCount = 0;
-	
+
+	//敌人职业
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 private:
 

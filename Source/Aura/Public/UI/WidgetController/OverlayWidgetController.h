@@ -38,7 +38,7 @@ class UAuraUserWidget;
 class UAuraAbilitySystemComponent;
 
 //声明代理类型，即委托签名
-//属性
+//属性变化
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float , NewValue);
 //消息组件表行
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow , Row);
@@ -85,6 +85,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FAbilityInfoSignature AbilityInfoDelegate;
 
+	//经验值
+	UPROPERTY(BlueprintAssignable, Category="GAS|XP")
+	FOnAttributeChangedSignature OXPPercentChangedDelegate;
+
 protected:
 	//设置消息组件数据表
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
@@ -100,6 +104,9 @@ protected:
 
 	//初始化拥有的技能回调
 	void OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
+
+	//经验值变化回调
+	void OnXPChanged(int32 NewXP) const;
 };
 
 //查找数据表

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ScalableFloat.h"
 #include "Engine/DataAsset.h"
 #include "CharacterClassInfo.generated.h"
 
@@ -27,14 +28,18 @@ struct FCharacterClassDefaultInfo
 {
 	GENERATED_BODY()
 
-	//特定的主要属性
+	//对应的主要属性
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 
-	//特定的GA
+	//对应的GA
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 
+	//对应的XP奖励
+	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
+	FScalableFloat XPReward = FScalableFloat();
+	
 };
 
 /**
@@ -47,7 +52,7 @@ class AURA_API UCharacterClassInfo : public UDataAsset
 
 public:
 
-	//Map将职业和属性结构体关联
+	//Map将职业和属性结构体关联，选择职业
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TMap<ECharacterClass, FCharacterClassDefaultInfo> CharacterClassInformation;
 	

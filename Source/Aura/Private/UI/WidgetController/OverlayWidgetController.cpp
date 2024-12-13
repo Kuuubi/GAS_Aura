@@ -6,6 +6,8 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
+#include "Player/AuraPlayerState.h"
 
 //广播初始值函数
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -24,7 +26,12 @@ void UOverlayWidgetController::BroadcastInitialValues()
 //绑定回调到依赖项函数
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
+	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	//绑定经验值变化回调
+	AuraPlayerState->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+	
 	const UAuraAttributeSet* AuraAttributeSet = CastChecked<UAuraAttributeSet>(AttributeSet);
+	
 	//生命值
 	//调用属性值变化时调用
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
@@ -115,4 +122,37 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemCo
 	});
 	//遍历技能并触发委托回调
 	AuraAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
+}
+
+void UOverlayWidgetController::OnXPChanged(int32 NewXP) const
+{
+	const AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	//获取升级信息数据
+	const ULevelUpInfo* LevelUpInfo = AuraPlayerState->LevelUpInfo;
+	checkf(LevelUpInfo, TEXT("无法找到 LevelUpInfo，请在PlayerState配置"));
+
+	//获取当前等级
+	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
+	//获取当前最大等级
+	const int32 MaxLevel = LevelUpInfo->LevelUpInformation.Num();
+
+	//计算百分比
+	if (Level <= MaxLevel && Level > 0)
+	{
+		//获取当前等级升级要达到XP值 900XP
+		const int32 LevelUpRequirement = LevelUpInfo->LevelUpInformation[Level].LevelUpRequirement;
+		//获取上一级升级要达到XP值 300XP
+		const int32 PreviousLevelUpRequirement = LevelUpInfo->LevelUpInformation[Level - 1].LevelUpRequirement;
+
+		//总进度 900XP - 300XP = 600XP
+		const int32 DeltaLevelRequirement = LevelUpRequirement - PreviousLevelUpRequirement;
+		//当前进度 400XP - 300XP = 100XP 
+		const int32 XPForThisLevel = NewXP - PreviousLevelUpRequirement;
+
+		//经验条进度百分比 100 / 600 = 10%
+		const float XPBarPercent = static_cast<float>(XPForThisLevel) / static_cast<float>(DeltaLevelRequirement);
+
+		//广播进度百分比
+		OXPPercentChangedDelegate.Broadcast(XPBarPercent);
+	}
 }
