@@ -11,6 +11,7 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Aura/AuraLogChannels.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
 
@@ -244,7 +245,43 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	{
 		const float LocalIncomingXP = GetIncomingXP();
 		SetIncomingXP(0.f);
-		UE_LOG(LogAura, Log, TEXT("传入XP：%f"), LocalIncomingXP);
+		//UE_LOG(LogAura, Log, TEXT("传入XP：%f"), LocalIncomingXP);
+		
+		//如果实现玩家，战斗接口
+		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
+		{
+			//获取当前等级	
+			const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(Props.SourceCharacter);
+			//获取当前XP
+			const int32 CurrentXP = IPlayerInterface::Execute_GetPlayerXP(Props.SourceCharacter);
+			
+			//通过XP查找等级
+			const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(Props.SourceCharacter, CurrentXP + LocalIncomingXP);
+			//升级次数 2级-1级=1次
+			const int32 NumOfLevelUps = NewLevel - CurrentLevel;
+			if (NumOfLevelUps > 0)
+			{
+				//获取要奖励多少可用属性点和技能点
+				const int32 AttributePointsReward = IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel);
+				const int32 SpellPointsReward = IPlayerInterface::Execute_GetSpellPointsReward(Props.SourceCharacter, CurrentLevel);
+
+				//增加玩家等级
+				IPlayerInterface::Execute_AddToPlayerLevel(Props.SourceCharacter, NumOfLevelUps);
+				//增加可用属性点和可用技能点
+				IPlayerInterface::Execute_AddToAttributePoints(Props.SourceCharacter, AttributePointsReward);
+				IPlayerInterface::Execute_AddToSpellPointsReward(Props.SourceCharacter, SpellPointsReward);
+				
+				//将当前血量和蓝量恢复满
+				SetHealth(GetMaxHealth());
+				SetMana(GetMaxMana());
+
+				//升级
+				IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+			}
+			
+			//增加经验
+			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
+		}
 	}
 	
 }
@@ -270,11 +307,11 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 
 void UAuraAttributeSet::SendXPEvent(const FEffectProperties& Props)
 {
-	//获取目标Combat接口
-	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetCharacter))
+	//检查目标是否实现战斗接口
+	if (Props.TargetCharacter->Implements<UCombatInterface>())
 	{
 		//获取目标等级
-		const int32 TargetLevel = CombatInterface->GetPlayerLevel();
+		const int32 TargetLevel = ICombatInterface::Execute_GetPlayerLevel(Props.TargetCharacter);
 		//获取目标职业
 		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
 		//获取经验奖励值
@@ -287,11 +324,7 @@ void UAuraAttributeSet::SendXPEvent(const FEffectProperties& Props)
 		Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
 		Payload.EventMagnitude = XPReward;
 		//发送经验事件
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			Props.SourceCharacter,
-			GameplayTags.Attributes_Meta_IncomingXP,
-			Payload
-			);
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
 	}
 }
 

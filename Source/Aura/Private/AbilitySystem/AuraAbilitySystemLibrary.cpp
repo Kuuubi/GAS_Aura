@@ -108,11 +108,11 @@ void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext
 	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
 	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
 	{
-		//获取战斗接口
-		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		//检查是否实现战斗接口
+		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
 		{
 			//获取玩家等级
-			int32 PlayerLevel = CombatInterface->GetPlayerLevel();
+			int32 PlayerLevel = ICombatInterface::Execute_GetPlayerLevel(ASC->GetAvatarActor());
 			//创建能力Spec
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, PlayerLevel);
 			//赋予能力

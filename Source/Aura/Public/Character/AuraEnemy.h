@@ -37,7 +37,7 @@ public:
 
 	/** Combat Interface */
 	//获取敌人等级
-	virtual int32 GetPlayerLevel() override;
+	virtual int32 GetPlayerLevel_Implementation() override;;
 	//角色死亡
 	virtual void Die() override;
 	/** end Combat Interface */

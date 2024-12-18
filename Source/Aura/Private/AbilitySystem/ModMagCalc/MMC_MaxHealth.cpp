@@ -37,9 +37,12 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	//如果Vigor值小于0将其设置为0
 	Vigor = FMath::Max<float>(Vigor, 0.0f);;
 
-	//获取玩家等级
-	ICombatInterface* CombatInterface = Cast<ICombatInterface>(Spec.GetContext().GetSourceObject());
-	const int32 PlayerLevel = CombatInterface->GetPlayerLevel();
+	//获取等级
+	int32 PlayerLevel = 1;
+	if (Spec.GetContext().GetSourceObject()->Implements<UCombatInterface>())
+	{
+		PlayerLevel = ICombatInterface::Execute_GetPlayerLevel(Spec.GetContext().GetSourceObject());
+	}
 
 	//自定义计算
 	return 50.f + 2.5f * Vigor + 10.f * PlayerLevel;

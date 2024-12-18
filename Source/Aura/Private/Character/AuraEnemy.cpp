@@ -91,7 +91,7 @@ AActor* AAuraEnemy::GetCombatTarget_Implementation() const
 }
 
 //获取敌人等级
-int32 AAuraEnemy::GetPlayerLevel()
+int32 AAuraEnemy::GetPlayerLevel_Implementation()
 {
 	return Level;
 }

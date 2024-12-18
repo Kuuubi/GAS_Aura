@@ -38,19 +38,25 @@ public:
 	FOnPlayerStatChanged OnXPChangedDelegate;
 	//等级变化委托
 	FOnPlayerStatChanged OnLevelChangedDelegate;
-
-	//获取玩家等级
-	FORCEINLINE int32 GetPlayerLevel() const { return Level; };
+	
 	//获取玩家经验值
 	FORCEINLINE int32 GetPlayerXP() const { return XP; };
+	//获取玩家等级
+	FORCEINLINE int32 GetPlayerLevel() const { return Level; };
 
 	//增加经验值
 	void AddToXP(int32 InXP);
+	//增加等级
 	void AddToLevel(int32 InLevel);
+	//增加可用属性点
+	//增加可用技能点
 	
 	//设置经验值
 	void SetXP(int32 InXP);
+	//设置等级
 	void SetLevel(int32 InLevel);
+	//设置可用属性点
+	//设置可用技能点
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -62,21 +68,21 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 private:
-	
-	//玩家等级
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_Level);
-	int32 Level = 1;
 
 	//玩家经验值
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_XP);
 	int32 XP = 1;
 
-
-	//服务器上等级变化时回调
-	UFUNCTION()
-	void OnRep_Level(int32 OldLevel);
+	//玩家等级
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_Level);
+	int32 Level = 1;
+	
 
 	//服务器上经验值变化时回调
 	UFUNCTION()
 	void OnRep_XP(int32 OldXP);
+
+	//服务器上等级变化时回调
+	UFUNCTION()
+	void OnRep_Level(int32 OldLevel);
 };

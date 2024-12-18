@@ -27,8 +27,16 @@ void UOverlayWidgetController::BroadcastInitialValues()
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	//绑定经验值变化回调
+	//绑定玩家经验值变化回调
 	AuraPlayerState->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+
+	//绑定玩家等级变化回调
+	AuraPlayerState->OnLevelChangedDelegate.AddLambda(
+			[this](int32 NewLevel)
+			{
+				OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+			}
+	);
 	
 	const UAuraAttributeSet* AuraAttributeSet = CastChecked<UAuraAttributeSet>(AttributeSet);
 	
@@ -149,10 +157,10 @@ void UOverlayWidgetController::OnXPChanged(int32 NewXP) const
 		//当前进度 400XP - 300XP = 100XP 
 		const int32 XPForThisLevel = NewXP - PreviousLevelUpRequirement;
 
-		//经验条进度百分比 100 / 600 = 10%
+		//经验条进度百分比 100 / 600 = 0.16
 		const float XPBarPercent = static_cast<float>(XPForThisLevel) / static_cast<float>(DeltaLevelRequirement);
 
-		//广播进度百分比
-		OXPPercentChangedDelegate.Broadcast(XPBarPercent);
+		//广播经验条进度百分比
+		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
 	}
 }

@@ -4,14 +4,39 @@
 #include "Character/AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "NiagaraComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/AuraHUD.h"
 
 AAuraCharacter::AAuraCharacter()
 {
+	//相机弹簧臂
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
+	CameraBoom->SetupAttachment(GetRootComponent());
+	//绝对旋转，角色旋转时不会跟随角色旋转
+	CameraBoom->SetUsingAbsoluteRotation(true);
+	//关闭弹簧臂和角色产生碰撞
+	CameraBoom->bDoCollisionTest = false;
+
+	//相机
+	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>("TopDownCameraComponent");
+	//连接弹簧臂末端插槽
+	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	//关闭使用Pawn控制旋转
+	TopDownCameraComponent->bUsePawnControlRotation = false;
+	
+	//升级奶瓜特效组件
+	LevelUpNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>("LevelUpNiagaraComponent");
+	LevelUpNiagaraComponent->SetupAttachment(GetRootComponent());
+	//升级奶瓜特效默认不会自动激活
+	LevelUpNiagaraComponent->bAutoActivate = false;
+	
 	//当设置为True时，角色将朝移动方向旋转
 	GetCharacterMovement()->bOrientRotationToMovement =true;
 	//控制角色旋转速率
@@ -49,11 +74,106 @@ void AAuraCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
-int32 AAuraCharacter::GetPlayerLevel()
+int32 AAuraCharacter::FindLevelForXP_Implementation(int32 InXP) const
+{
+	//获取玩家状态
+	const AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//通过XP查找当前等级
+	return AuraPlayerState->LevelUpInfo->FindLevelForXP(InXP);
+}
+
+int32 AAuraCharacter::GetPlayerXP_Implementation() const
+{
+	//获取玩家状态
+	const AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//获取当前经验值
+	return AuraPlayerState->GetPlayerXP();
+}
+
+int32 AAuraCharacter::GetAttributePointsReward_Implementation(int32 Level) const
+{
+	//获取玩家状态
+	const AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//获取要奖励多少属性点
+	return AuraPlayerState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
+}
+
+int32 AAuraCharacter::GetSpellPointsReward_Implementation(int32 Level) const
+{
+	//获取玩家状态
+	const AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//获取要奖励多少技能点
+	return AuraPlayerState->LevelUpInfo->LevelUpInformation[Level].SpellPointAward;
+}
+
+void AAuraCharacter::AddToXP_Implementation(int32 InXP)
+{
+	//获取玩家状态
+	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//增加玩家经验
+	AuraPlayerState->AddToXP(InXP);
+}
+
+void AAuraCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
+{
+	//获取玩家状态
+	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//增加玩家等级
+	return AuraPlayerState->AddToLevel(InPlayerLevel);
+}
+
+void AAuraCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
+{
+	//获取玩家状态
+	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//增加可用属性点
+	//return AuraPlayerState->
+}
+
+void AAuraCharacter::AddToSpellPointsReward_Implementation(int32 InSpellPointsReward)
+{
+	//获取玩家状态
+	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	//增加可用技能点
+	//return AuraPlayerState->
+}
+
+void AAuraCharacter::LevelUp_Implementation()
+{
+	//多播升级粒子特效
+	MulticastLevelUpParticles();
+}
+
+void AAuraCharacter::MulticastLevelUpParticles_Implementation() const
+{
+	if (IsValid(LevelUpNiagaraComponent))
+	{
+		//获取相机位置
+		const FVector CameraLocation = TopDownCameraComponent->GetComponentLocation();
+		//获取奶瓜粒子特效位置
+		const FVector NiagaraSystemLocation = LevelUpNiagaraComponent->GetComponentLocation();
+		//计算旋转 粒子和相机朝向平行
+		const FRotator ToCameraRotation = (CameraLocation - NiagaraSystemLocation).Rotation();
+		//设置粒子特效世界坐标旋转
+		LevelUpNiagaraComponent->SetWorldRotation(ToCameraRotation);
+		//激活
+		LevelUpNiagaraComponent->Activate(true);
+	}
+}
+
+int32 AAuraCharacter::GetPlayerLevel_Implementation()
 {
 	//检查玩家状态
 	const AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
-	check((AuraPlayerState));
+	check(AuraPlayerState);
 	//获取玩家等级
 	return AuraPlayerState->GetPlayerLevel();
 }

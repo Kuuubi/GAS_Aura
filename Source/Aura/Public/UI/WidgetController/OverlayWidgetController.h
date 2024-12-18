@@ -8,26 +8,26 @@
 #include "OverlayWidgetController.generated.h"
 
 
-//UI组件数据表结构
+//拾取物品消息提示条UI控件数据表结构
 USTRUCT(BlueprintType)
 struct FUIWidgetRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	//初始化
-	//游戏标签
+	//消息物品游戏标签Message.HealthPotion
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag MessageTag = FGameplayTag();
 
-	//文本
+	//描述文本
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)	
 	FText Message = FText();
-
-	//对任何给定的游戏标签，创建一个组件并将其添加到视口
+	
+	//选择哪个蓝图类，将其创建到主HUD
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<class UAuraUserWidget> MessageWidget;
 
-	//图像
+	//物品图像
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UTexture2D* Image = nullptr;
 	
@@ -40,7 +40,9 @@ class UAuraAbilitySystemComponent;
 //声明代理类型，即委托签名
 //属性变化
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float , NewValue);
-//消息组件表行
+//等级，可用属性点和技能点
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32 , NewValue);
+//拾取消息提示条组件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow , Row);
 //技能信息数据
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfo, Info);
@@ -85,9 +87,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FAbilityInfoSignature AbilityInfoDelegate;
 
-	//经验值
+	//玩家经验条百分比变化
 	UPROPERTY(BlueprintAssignable, Category="GAS|XP")
-	FOnAttributeChangedSignature OXPPercentChangedDelegate;
+	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
+
+	//玩家等级变化
+	UPROPERTY(BlueprintAssignable, Category="GAS|Level")
+	FOnPlayerStatChangedSignature OnPlayerLevelChangedDelegate;
 
 protected:
 	//设置消息组件数据表
