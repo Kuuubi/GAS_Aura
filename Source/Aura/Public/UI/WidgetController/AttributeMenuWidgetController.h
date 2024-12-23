@@ -7,8 +7,9 @@
 #include "AttributeMenuWidgetController.generated.h"
 
 class UAttributeInfo;
-//属性信息委托
 struct FAuraAttributeInfo;
+struct FGameplayTag;
+//属性信息委托
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FAuraAttributeInfo&, Info);
 
 /**
@@ -26,8 +27,16 @@ public:
 	virtual  void BroadcastInitialValues() override;
 
 	//蓝图绑定属性信息委托
-	UPROPERTY(BlueprintAssignable, Category="GAS | Attributes")
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
 	FAttributeInfoSignature AttributeInfoDelegate;
+
+	//可用属性点变化委托
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnPlayerStatChangedSignature AttributePointsChangedDelegate;
+
+	//要增加的属性
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 
 protected:
 	//属性信息数据资产

@@ -55,7 +55,7 @@ void UAuraInputComponent::BindAbilityActions(const UAuraInputConfig* InputConfig
 			if (HeldFunc)
 			{
 				//一直按下持续触发
-				BindAction(Action.InputAction, ETriggerEvent::Triggered,	Object, HeldFunc, Action.InputTag);
+				BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, HeldFunc, Action.InputTag);
 			}
 		}
 	}

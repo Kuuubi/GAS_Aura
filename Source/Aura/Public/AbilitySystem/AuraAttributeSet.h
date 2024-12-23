@@ -78,8 +78,10 @@ public:
 
 	//属性值变化前触发函数
 	virtual  void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
-	//属性值变化后触发函数
+	//效果应用后触发函数
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+	//属性值变化后触发函数
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	//Map标签到属性
 	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
@@ -294,4 +296,9 @@ private:
 	
 	//发送经验事件
 	void SendXPEvent(const FEffectProperties& Props);
+
+	//判断升级满血
+	bool bTopOffHealth = false;
+	//判断升级满蓝
+	bool bTopOffMana = false;
 };

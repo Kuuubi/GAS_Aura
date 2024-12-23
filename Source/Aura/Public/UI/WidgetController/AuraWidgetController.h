@@ -6,6 +6,9 @@
 #include "AbilitySystemComponent.h"
 #include "AuraWidgetController.generated.h"
 
+//等级，可用属性点和技能点
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32 , NewValue);
+
 class UAuraAbilitySystemComponent;
 class UAttributeSet;
 

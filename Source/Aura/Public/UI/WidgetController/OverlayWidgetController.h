@@ -39,9 +39,7 @@ class UAuraAbilitySystemComponent;
 
 //声明代理类型，即委托签名
 //属性变化
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float , NewValue);
-//等级，可用属性点和技能点
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32 , NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 //拾取消息提示条组件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow , Row);
 //技能信息数据

@@ -51,6 +51,13 @@ public:
 	//通过Spec获取Input标签
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
+	//要增加的属性
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
+
+	//服务器RPC增加属性
+	UFUNCTION(Server, Reliable)
+	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
+
 protected:
 
 	//客户端广播拥有技能

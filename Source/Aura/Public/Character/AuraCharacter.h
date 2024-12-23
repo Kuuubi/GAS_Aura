@@ -29,28 +29,24 @@ public:
 	/** Player Interface */
 	//通过XP查找当前等级
 	virtual int32 FindLevelForXP_Implementation(int32 InXP) const override;
-	
 	//获取当前经验值
 	virtual int32 GetPlayerXP_Implementation() const override;
-
 	//获取要奖励多少可用属性点
 	virtual int32 GetAttributePointsReward_Implementation(int32 Level) const override;
-
 	//获取要奖励多少可用技能点
 	virtual int32 GetSpellPointsReward_Implementation(int32 Level) const override;
-	
+	//获取可用属性点
+	virtual int32 GetAttributePoints_Implementation() const override;
+	//获取可用技能点
+	virtual int32 GetSpellPoints_Implementation() const override;
 	//增加玩家经验值
 	virtual void AddToXP_Implementation(int32 InXP) override;
-
 	//增加玩家等级
 	virtual void AddToPlayerLevel_Implementation(int32 InPlayerLevel) override;
-
 	//增加可用属性点
 	virtual void AddToAttributePoints_Implementation(int32 InAttributePoints) override;
-	
 	//增加可用技能点
-	virtual void AddToSpellPointsReward_Implementation(int32 InSpellPointsReward) override;
-
+	virtual void AddToSpellPoints_Implementation(int32 InSpellPointsReward) override;
 	//升级
 	virtual void LevelUp_Implementation() override;
 	/** end Player Interface */
