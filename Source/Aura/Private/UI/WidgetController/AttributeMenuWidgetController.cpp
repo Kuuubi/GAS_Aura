@@ -11,12 +11,11 @@
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
 	//获取属性集
-	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
 	check(AttributeInfo)
 	//循环Map
-	for (auto& Pair : AS->TagsToAttributes)
+	for (auto& Pair : GetAuraAS()->TagsToAttributes)
 	{
-		//属性发生变化时委托
+		//属性发生变化时广播
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
 			{
@@ -24,10 +23,9 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 			}
 		);
 	}
-
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	//绑定玩家可用属性点变化回调
-	AuraPlayerState->OnAttributePointsChangedDelegate.AddLambda(
+	
+	//玩家可用属性点变化广播
+	GetAuraPS()->OnAttributePointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			AttributePointsChangedDelegate.Broadcast(Points);
@@ -39,29 +37,25 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
 	//获取属性集
-	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
 	check(AttributeInfo)
 
 	//查找标签
-	for (auto& Pair : AS->TagsToAttributes)
+	for (auto& Pair : GetAuraAS()->TagsToAttributes)
 	{
 		BroadcastAttributeInfo(Pair.Key, Pair.Value());
 	}
 	
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
 	//广播初始值
-	AttributePointsChangedDelegate.Broadcast(AuraPlayerState->GetAttributePoints());
+	AttributePointsChangedDelegate.Broadcast(GetAuraPS()->GetAttributePoints());
 
 }
 
 void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
-	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
-	AuraASC->UpgradeAttribute(AttributeTag);
+	GetAuraASC()->UpgradeAttribute(AttributeTag);
 }
 
-void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag,
-                                                            const FGameplayAttribute& Attribute) const
+void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag,const FGameplayAttribute& Attribute) const
 {
 	//属性信息
 	FAuraAttributeInfo Info =  AttributeInfo->FindAttributeInfoForTag(AttributeTag);

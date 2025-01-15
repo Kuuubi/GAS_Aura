@@ -3,14 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystemComponent.h"
 #include "AuraWidgetController.generated.h"
 
 //等级，可用属性点和技能点
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32 , NewValue);
+//技能信息数据
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfo&, Info);
 
-class UAuraAbilitySystemComponent;
 class UAttributeSet;
+class UAbilitySystemComponent;
+class AAuraPlayerController;
+class AAuraPlayerState;
+class UAuraAbilitySystemComponent;
+class UAuraAttributeSet;
+class UAbilityInfo;
 
 USTRUCT(BlueprintType)
 
@@ -57,7 +63,19 @@ public:
 	//绑定回调到依赖项
 	virtual  void BindCallbacksToDependencies();
 
+	//技能信息数据
+	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
+	FAbilityInfoSignature AbilityInfoDelegate;
+
+	//广播主动技能信息数据
+	void BroadcastAbilityInfo();
+
 protected:
+
+	//设置技能数据资产
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
 	//创建所需数据的四个指针
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<APlayerController> PlayerController;
@@ -70,5 +88,22 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	//Aura
+	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	TObjectPtr<AAuraPlayerController> AuraPlayerController;
 	
+	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	TObjectPtr<AAuraPlayerState> AuraPlayerState;
+
+	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
+	TObjectPtr<UAuraAttributeSet> AuraAttributeSet;
+
+	AAuraPlayerController* GetAuraPC();
+	AAuraPlayerState* GetAuraPS();
+	UAuraAbilitySystemComponent* GetAuraASC();
+	UAuraAttributeSet* GetAuraAS();
 };

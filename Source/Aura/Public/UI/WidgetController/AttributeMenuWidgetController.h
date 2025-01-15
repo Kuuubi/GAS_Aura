@@ -7,6 +7,7 @@
 #include "AttributeMenuWidgetController.generated.h"
 
 class UAttributeInfo;
+struct FGameplayAttribute;
 struct FAuraAttributeInfo;
 struct FGameplayTag;
 //属性信息委托
@@ -21,7 +22,7 @@ class AURA_API UAttributeMenuWidgetController : public UAuraWidgetController
 	GENERATED_BODY()
 
 public:
-	//绑定回调到依赖项
+	//绑定监听数值变化依赖
 	virtual  void BindCallbacksToDependencies() override;
 	//广播初始值
 	virtual  void BroadcastInitialValues() override;

@@ -143,7 +143,13 @@ void AAuraCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
 	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);
 	//增加玩家等级
-	return AuraPlayerState->AddToLevel(InPlayerLevel);
+	AuraPlayerState->AddToLevel(InPlayerLevel);
+
+	//满足技能的玩家等级要求更新技能状态
+	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		AuraASC->UpdateAbilityStatus(AuraPlayerState->GetPlayerLevel());
+	}
 }
 
 void AAuraCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
@@ -152,7 +158,7 @@ void AAuraCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints
 	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);
 	//增加可用属性点
-	return AuraPlayerState->AddToAttributePoints(InAttributePoints);
+	AuraPlayerState->AddToAttributePoints(InAttributePoints);
 }
 
 void AAuraCharacter::AddToSpellPoints_Implementation(int32 InSpellPointsReward)
@@ -161,7 +167,7 @@ void AAuraCharacter::AddToSpellPoints_Implementation(int32 InSpellPointsReward)
 	AAuraPlayerState* AuraPlayerState =  GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);
 	//增加可用技能点
-	return AuraPlayerState->AddToSpellPoints(InSpellPointsReward);
+	AuraPlayerState->AddToSpellPoints(InSpellPointsReward);
 }
 
 void AAuraCharacter::LevelUp_Implementation()

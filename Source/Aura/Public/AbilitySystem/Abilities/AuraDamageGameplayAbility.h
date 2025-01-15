@@ -33,5 +33,8 @@ protected:
 	//从攻击方式数组随机获取索引
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontageFromArray (const TArray<FTaggedMontage>& TaggedMontage) const;
+
+	//根据技能的伤害类型标签和技能等级获取伤害值
+	float GetDamageByDamageType(float InLevel, const FGameplayTag& DamageType);
 	
 };

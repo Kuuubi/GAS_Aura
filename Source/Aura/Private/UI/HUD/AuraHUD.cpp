@@ -5,17 +5,18 @@
 
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "UI/WidgetController/SpellMenuWidgetController.h"
 
-//创建或返回Overlay控制器
+//创建或返回Overlay控制层
 UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
 {
 	if (OverlayWidgetController == nullptr)
 	{
-		//创建控制器，其类为蓝图中设置的Overlay组件控制器类
-		OverlayWidgetController = NewObject<UOverlayWidgetController>(this,  OverlayWidgetControllerClass );
-		//调用控制器父类里的设置对应参数函数
+		//创建控制层，其类为蓝图中设置的Overlay组件控制层类
+		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
+		//调用控制层父类里的设置对应参数函数
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
-		//调用绑定回调到依赖函数，属性值变化时
+		//绑定监听数值变化依赖
 		OverlayWidgetController->BindCallbacksToDependencies();
 	}
 	return OverlayWidgetController;
@@ -25,13 +26,26 @@ UAttributeMenuWidgetController* AAuraHUD::GetAttributeMenuWidgetController(const
 {
 	if (AttributeMenuWidgetController == nullptr)
 	{
-		//使用新对象为蓝图设置的AttributeMenu组件控制器类创建组件控制器
-		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this,  AttributeMenuWidgetControllerClass );
+		//使用新对象为蓝图设置的AttributeMenu组件控制层类创建组件控制层
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
 		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
-		//绑定监听数值变化
+		//绑定监听数值变化依赖
 		AttributeMenuWidgetController->BindCallbacksToDependencies();
 	}
 	return AttributeMenuWidgetController;
+}
+
+USpellMenuWidgetController* AAuraHUD::GetSpellMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (SpellMenuWidgetController == nullptr)
+	{
+		//使用新对象为蓝图设置的SpellMenu组件控制层类创建组件控制层
+		SpellMenuWidgetController = NewObject<USpellMenuWidgetController>(this, SpellMenuWidgetControllerClass);
+		SpellMenuWidgetController->SetWidgetControllerParams(WCParams);
+		//绑定监听数值变化依赖
+		SpellMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return SpellMenuWidgetController;
 }
 
 //初始化Overlay
@@ -44,11 +58,11 @@ void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
 	OverlayWidget = Cast<UAuraUserWidget>(Widget);
 
-	//构建Overlay组件控制器
+	//构建Overlay组件控制层
 	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 
-	//调用父类里的设置组件控制器函数
+	//调用父类里的设置组件控制层函数
 	OverlayWidget->SetWidgetController(WidgetController);
 	//调用广播初始值函数
 	WidgetController->BroadcastInitialValues();

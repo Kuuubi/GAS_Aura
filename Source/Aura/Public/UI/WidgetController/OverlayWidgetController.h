@@ -42,8 +42,7 @@ class UAuraAbilitySystemComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 //拾取消息提示条组件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow , Row);
-//技能信息数据
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FAuraAbilityInfo, Info);
+
 
 
 
@@ -59,7 +58,7 @@ public:
 	//广播初始值函数
 	virtual  void BroadcastInitialValues() override;
 
-	//绑定回调到依赖项函数
+	//绑定监听数值变化依赖
 	virtual  void BindCallbacksToDependencies() override;
 
 	//定义代理的广播属性值
@@ -81,10 +80,6 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
-	//技能信息数据
-	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
-	FAbilityInfoSignature AbilityInfoDelegate;
-
 	//玩家经验条百分比变化
 	UPROPERTY(BlueprintAssignable, Category="GAS|XP")
 	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
@@ -97,20 +92,16 @@ protected:
 	//设置消息组件数据表
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
-
-	//设置技能数据资产
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Data")
-	TObjectPtr<UAbilityInfo> AbilityInfo;
 	
 	//查找数据表
 	template<typename  T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
 
-	//初始化拥有的技能回调
-	void OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
-
 	//经验值变化回调
-	void OnXPChanged(int32 NewXP) const;
+	void OnXPChanged(int32 NewXP);
+
+	// 装备新技能
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot) const;
 };
 
 //查找数据表

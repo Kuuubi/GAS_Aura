@@ -64,6 +64,12 @@ public:
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
+
+	/*
+	* 被动技能标签
+	*/
+	FGameplayTag InputTag_Passive_1;
+	FGameplayTag InputTag_Passive_2;
 	
 	/*
 	* 伤害类型标签
@@ -82,15 +88,33 @@ public:
 	/*
 	* 能力标签
 	*/
+	FGameplayTag Abilities_None;
+	
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
+	
+	FGameplayTag Abilities_HitReact;
+
+	//技能状态
+	FGameplayTag Abilities_Status_Locked;
+	FGameplayTag Abilities_Status_Eligible;
+	FGameplayTag Abilities_Status_Unlocked;
+	FGameplayTag Abilities_Status_Equipped;
+
+	//技能类型
+	FGameplayTag Abilities_Type_Offensive;
+	FGameplayTag Abilities_Type_Passive;
+	FGameplayTag Abilities_Type_None;
+	
 	//技能
 	FGameplayTag Abilities_Fire_FireBolt;
+	FGameplayTag Abilities_Lightning_Electrocute;
 
 	/*
-	* 冷却标签
+	* 技能冷却标签
 	*/
 	FGameplayTag Cooldown_Fire_FireBolt;
+	FGameplayTag Cooldown_Lightning_Electrocute;
 
 	/*
 	* 受击标签

@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "AuraGameModeBase.generated.h"
 
+class UAbilityInfo;
 class UCharacterClassInfo;
 
 /**
@@ -20,5 +21,9 @@ public:
 	//设置敌人职业属性数据资产
 	UPROPERTY(EditDefaultsOnly, Category="Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
+
+	//设置技能信息数据资产
+	UPROPERTY(EditDefaultsOnly, Category="Ability Info")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
 	
 };

@@ -7,10 +7,16 @@
 #include "Engine/DataAsset.h"
 #include "AbilityInfo.generated.h"
 
+class UGameplayAbility;
+
 USTRUCT(BlueprintType)
 struct FAuraAbilityInfo
 {
 	GENERATED_BODY()
+
+	// 技能类型标签
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag AbilityType = FGameplayTag();
 
 	//技能标签
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -19,6 +25,10 @@ struct FAuraAbilityInfo
 	//冷却标签
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag CooldownTag= FGameplayTag();
+
+	//技能状态标签
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag StatusTag = FGameplayTag();
 
 	//输入映射标签
 	UPROPERTY(BlueprintReadOnly)
@@ -31,6 +41,14 @@ struct FAuraAbilityInfo
 	//背景材质
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<const UMaterialInterface> BackgroundMaterial = nullptr;
+
+	//玩家等级要求
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 LevelRequirement = 1;
+
+	//当前技能使用的技能类GA
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> Ability;
 	
 };
 

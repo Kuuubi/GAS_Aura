@@ -291,13 +291,13 @@ void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
 	//回满血
-	if (Attribute == GetHealthAttribute() && bTopOffHealth)
+	if (Attribute == GetMaxHealthAttribute() && bTopOffHealth)
 	{
 		SetHealth(GetMaxHealth());
 		bTopOffHealth = false;
 	}
 	//回满蓝
-	if (Attribute == GetManaAttribute() && bTopOffMana)
+	if (Attribute == GetMaxManaAttribute() && bTopOffMana)
 	{
 		SetMana(GetMaxMana());
 		bTopOffMana = false;
