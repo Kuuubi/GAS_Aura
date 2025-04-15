@@ -39,7 +39,7 @@ public:
 	//获取敌人等级
 	virtual int32 GetPlayerLevel_Implementation() override;;
 	//角色死亡
-	virtual void Die() override;
+	virtual void Die(const FVector& DeathImpulse) override;
 	/** end Combat Interface */
 
 	//委托血量
@@ -54,10 +54,6 @@ public:
 	//是否被击中
 	UPROPERTY(BlueprintReadOnly, Category="Combat")
 	bool bHitReacting = false;
-
-	//设置移动速度
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	float BaseWalkSpeed = 250.f;
 
 	//设置死亡后存在时间
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
@@ -74,6 +70,9 @@ protected:
 
 	//初始化属性值
 	virtual void InitializeDefaultAttribute() const override;
+
+	// 修改Stunned黑板键布尔值
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 
 	//敌人等级
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")

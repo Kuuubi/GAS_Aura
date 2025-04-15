@@ -286,6 +286,14 @@ public:
 	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
 
 private:
+	// 处理传入伤害时处理的逻辑
+	void HandleIncomingDamage(const FEffectProperties& Props);
+	
+	// 处理传入经验时处理的逻辑
+	void HandleIncomingXP(const FEffectProperties& Props);
+	
+	// 处理传入Debuff时处理的逻辑
+	void Debuff(const FEffectProperties& Props);
 
 	//设置属性影响结构体函数
 	//获取效果的来源和目标

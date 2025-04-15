@@ -60,6 +60,14 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 			//控制与其他对象碰撞的情况下如何处理生成此Actor
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
+		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+
+		//最终生成
+		Projectile->FinishSpawning(SpawnTransform);
+
+		/*
+		 * 不再手动设置生成的抛射物SpecHandle，改用DamageEffectParams
+		 *	===================================================================================================
 		//设置伤害
 		//获取ASC
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
@@ -87,18 +95,24 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 		FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 
 		//遍历DamageTypes
-		for (auto& Pair : DamageTypes)
-		{
-			//曲线表根据等级获取技能伤害
-			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
-			//由调用者设置
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
-		}
+		// for (auto& Pair : DamageTypes)
+		// {
+		// 	//曲线表根据等级获取技能伤害
+		// 	const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+		// 	//由调用者设置
+		// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		// }
+
+		// 获取技能伤害
+		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+		// 由调用者设置
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageType, ScaledDamage);
 		
 		//设置生成的抛射物SpecHandle
 		Projectile->DamageEffectSpecHandle = SpecHandle;
+		*	===================================================================================================
+		*/
+
 		
-		//最终生成
-		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

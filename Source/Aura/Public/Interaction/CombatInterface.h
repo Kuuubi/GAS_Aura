@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
 #include  "AbilitySystem/Data/CharacterClassInfo.h"
@@ -10,6 +11,9 @@
 
 class UNiagaraSystem;
 class UAnimMontage;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*); // Actor初始化ASC完成后委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, AActor*, DeadActor); // Actor死亡后的委托
 
 //攻击方式结构体
 USTRUCT(BlueprintType)
@@ -73,7 +77,7 @@ public:
 	UAnimMontage* GetHitReactMontage();
 
 	//角色死亡
-	virtual void Die() = 0;
+	virtual void Die(const FVector& DeathImpulse) = 0;
 
 	//判断角色死亡
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -106,4 +110,31 @@ public:
 	//获取敌人职业类型
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	ECharacterClass GetCharacterClass();
+
+	// 获取ASC注册成功后的委托
+	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() = 0;
+	// 获取Actor死亡后的委托
+	virtual FOnDeathSignature& GetOnDeathDelegate() = 0;
+
+	//设置为处于持续释放技能
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetInShockLoop(bool bInLoop);
+
+	// 获取武器骨骼网格体
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USkeletalMeshComponent* GetWeapon();
+
+	/**
+	 * 获取角色是否被持续攻击状态
+	 * @return 布尔值，如果处于返回true
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsBeingShocked();
+
+	/**
+	 * 设置角色是否被持续攻击状态
+	 * @param bInShock 
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetIsBeingShocked(bool bInShock);
 };

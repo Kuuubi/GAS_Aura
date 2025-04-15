@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Components/SplineComponent.h"
 #include "Input/AuraInputComponent.h"
@@ -106,6 +107,17 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, 
 //鼠标跟踪
 void AAuraPlayerController::CursorTrace()
 {
+	// 匹配阻止标签
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		// 清除高亮相关内容
+		if (ThisActor) ThisActor->HighlightActoer();
+		if (LastActor) LastActor->UnHighlightActoer();
+		ThisActor = nullptr;
+		LastActor = nullptr;
+		return;
+	}
+	
 	//返回鼠标下命中
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	//是否命中被阻挡
@@ -114,10 +126,10 @@ void AAuraPlayerController::CursorTrace()
 	LastActor = ThisActor;
 	//判断是否实现敌人接口
 	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-	if (LastActor != ThisActor)
+	if (ThisActor != LastActor)
 	{
-		if (LastActor) LastActor->UnHighlightActoer();
 		if (ThisActor) ThisActor->HighlightActoer();
+		if (LastActor) LastActor->UnHighlightActoer();
 	}
 }
 
@@ -125,6 +137,12 @@ void AAuraPlayerController::CursorTrace()
 //短按
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	// 匹配阻止标签
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+	
 	//鼠标左键标签
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
@@ -135,16 +153,24 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 		//重置长按时间
 		FollowTime = 0.f;
 	}
+	//调用ASC按键按下事件
+	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 
 }
 
 //释放
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	// 匹配阻止标签
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+	
 	//如果不是鼠标左键标签
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		//输入被按下
+		//输入被释放
 		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 		return;
 	}
@@ -155,12 +181,12 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	//实现自动寻路
 	if (!bTargeting && !bShiftKeyDown)
 	{
-		//输入被按下
+		//输入被释放
 		if (GetASC())	GetASC()->AbilityInputTagReleased(InputTag);
 		{
 			//获取Pawn
 			const APawn* ControlledPawn = GetPawn();
-			//短按
+			//判断为短按
 			if (FollowTime <= ShortPressThreshold && ControlledPawn)
 			{
 				//创建导航路径
@@ -183,7 +209,13 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 						//自动寻路
 						bAutoRunning = true;
 					}
-
+				}
+				// 匹配阻止标签
+				if (GetASC() && !GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+				{
+					//短按释放生成点击奶瓜特效
+					UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+					return;
 				}
 			}
 			//重置长按时间
@@ -197,6 +229,12 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 //长按
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	// 匹配阻止标签
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
+	
 	//如果不是鼠标左键标签
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
@@ -270,6 +308,12 @@ void AAuraPlayerController::AutoRun()
 //键盘移动
 void AAuraPlayerController::Move(const struct FInputActionValue& InputActionValue)
 {
+	// 匹配阻止标签
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+	
 	//获取输入操作的2d向量值
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2d>();
 	//获取控制器旋转

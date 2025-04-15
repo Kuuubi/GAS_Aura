@@ -43,14 +43,6 @@ public:
 	FGameplayTag Attributes_Secondary_MaxMana;
 
 	/*
-	* 属性抗性标签
-	*/
-	FGameplayTag Attributes_Resistance_Fire;
-	FGameplayTag Attributes_Resistance_Lightning;
-	FGameplayTag Attributes_Resistance_Arcane;
-	FGameplayTag Attributes_Resistance_Physical;
-
-	/*
 	* 元属性标签
 	*/
 	FGameplayTag Attributes_Meta_IncomingXP;
@@ -79,11 +71,38 @@ public:
 	FGameplayTag Damage_Lightning;
 	FGameplayTag Damage_Arcane;
 	FGameplayTag Damage_Physical;
+
+	/*
+	* 伤害类型对应属性抗性标签
+	*/
+	FGameplayTag Attributes_Resistance_Fire;
+	FGameplayTag Attributes_Resistance_Lightning;
+	FGameplayTag Attributes_Resistance_Arcane;
+	FGameplayTag Attributes_Resistance_Physical;
+
+	/*
+	* 伤害类型对应Debuff标签
+	*/
+	FGameplayTag Debuff_Burn;
+	FGameplayTag Debuff_Stun;
+	FGameplayTag Debuff_Arcan;
+	FGameplayTag Debuff_Physical;
+
+	// Debuff相关标签
+	FGameplayTag Debuff_Chance;
+	FGameplayTag Debuff_Damage;
+	FGameplayTag Debuff_Frequency;
+	FGameplayTag Debuff_Duration;
 	
 	/*
 	* 伤害类型对应抗性
 	*/
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+
+	/*
+	* 伤害类型对Debuff
+	*/
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuff;
 
 	/*
 	* 能力标签
@@ -134,10 +153,16 @@ public:
 	FGameplayTag CombatSocket_Tail;
 
 	//攻击动作索引标签
-	FGameplayTag Montage_Attack_1;;
-	FGameplayTag Montage_Attack_2;;
-	FGameplayTag Montage_Attack_3;;
-	FGameplayTag Montage_Attack_4;;
+	FGameplayTag Montage_Attack_1;
+	FGameplayTag Montage_Attack_2;
+	FGameplayTag Montage_Attack_3;
+	FGameplayTag Montage_Attack_4;
+
+	// 阻止玩家控制器输入相关事件标签
+	FGameplayTag Player_Block_InputPressed; // 阻止按键按下
+	FGameplayTag Player_Block_InputHeld; // 阻止按键悬停
+	FGameplayTag Player_Block_InputReleased; // 阻止键位抬起
+	FGameplayTag Player_Block_CursorTrace; // 阻止鼠标追踪
 
 private:
 	//静态成员变量

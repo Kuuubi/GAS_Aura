@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 class UGameplayAbility;
 class UGameplayEffect;
@@ -23,6 +24,10 @@ class AURA_API AAuraCharacterBase : public ACharacter, public  IAbilitySystemInt
 
 public:
 	AAuraCharacterBase();
+	
+	// 重载复制属性函数
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	//GetASC
 	virtual  UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//GetAS
@@ -33,7 +38,7 @@ public:
 	virtual  UAnimMontage* GetHitReactMontage_Implementation() override;
 
 	//角色死亡
-	virtual void Die() override;
+	virtual void Die(const FVector& DeathImpulse) override;
 	
 	//获取生成火球的骨骼插槽位置
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
@@ -60,15 +65,53 @@ public:
 
 	//获取职业类型
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
+
+	// 获取ASC注册成功委托
+	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() override;
+
+	// 获取角色死亡委托
+	virtual FOnDeathSignature& GetOnDeathDelegate() override;
+
+	// 获取武器骨骼网格体
+	virtual USkeletalMeshComponent* GetWeapon_Implementation() override;
+
+	// 设置角色是否被持续攻击状态
+	virtual void SetIsBeingShocked_Implementation(bool bInShock) override;
+
+	// 获取角色是否被持续攻击状态
+	virtual bool IsBeingShocked_Implementation() override;
 	/** end Combat Interface */
+
+	FOnASCRegistered OnAscRegistered;
+	FOnDeathSignature OnDeathDelegate;
 	
 	//多播死亡
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastHandleDeath();
+	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
 
 	//攻击方式结构体数组
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TArray<FTaggedMontage> AttackMontages;
+
+	// 角色是否为被眩晕状态
+	UPROPERTY(ReplicatedUsing=OnRep_Stunned, BlueprintReadOnly)
+	bool bIsStunned = false;
+
+	// 角色是否为被点燃状态
+	UPROPERTY(ReplicatedUsing=OnRep_Burned, BlueprintReadOnly)
+	bool bIsBurned = false;
+
+	// 角色是否为被持续攻击状态
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bIsBeingShocked = false;
+
+	// 眩晕状态复制通知回调
+	UFUNCTION()
+	virtual void OnRep_Stunned();
+
+	// 点燃状态复制通知回调
+	UFUNCTION()
+	virtual void OnRep_Burned();
 
 protected:
 	virtual void BeginPlay() override;
@@ -96,6 +139,13 @@ protected:
 	//角色是否死亡
 	bool bDead = false;
 
+	// 眩晕标签变化后的回调
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	// 设置移动速度
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
+	float BaseWalkSpeed = 600.f;
+
 	UPROPERTY()
 	//技能系统组件
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -105,7 +155,7 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 	//初始化ActorInfo
-	virtual   void  InitAbilityActorInfo();
+	virtual void InitAbilityActorInfo();
 	
 	//默认主要属性游戏效果
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
@@ -159,6 +209,14 @@ protected:
 	//敌人职业
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+
+	// 火焰Debuff奶瓜特效
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffComponent;
+
+	// 眩晕Debuff奶瓜特效
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> StunDebuffComponent;
 
 private:
 

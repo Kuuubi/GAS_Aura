@@ -50,6 +50,9 @@ void AAuraProjectile::BeginPlay()
 
 	//火球存在时间
 	SetLifeSpan(LifeSpan);
+
+	// 移动开启复制
+	SetReplicateMovement(true);
 	
 	//触发重叠时回调
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereOverlap);
@@ -59,20 +62,32 @@ void AAuraProjectile::BeginPlay()
 	
 }
 
+void AAuraProjectile::OnHit()
+{
+	//播放声音
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	//播放特效
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	//停止播放移动音效
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
+	bHit = true;
+}
+
 //销毁
 void AAuraProjectile::Destroyed()
 {
-	//如果没有权威，并且bHit没有修改为true，则当前没有触发重叠事件，当销毁前播放声音和特效
-	if (!bHit && !HasAuthority())
-	{
-		//播放声音
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		//播放特效
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-		//停止播放移动音效
-		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
-		bHit = true;
-	}
+	if (LoopingSoundComponent)
+    {
+    	LoopingSoundComponent->Stop();
+    	LoopingSoundComponent->DestroyComponent();
+    }
+	//如果没有权限，并且bHit没有修改为true，则当前没有触发重叠事件，当销毁前播放声音和特效
+	if (!bHit && !HasAuthority()) OnHit();
+	
 	Super::Destroyed();
 }
 
@@ -80,44 +95,47 @@ void AAuraProjectile::Destroyed()
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlapPrimitiveComponent, AActor* OtherActor,
                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (DamageEffectParams.SourceAbilitySystemComponent == NULL) return;
 	//防止自己打自己
-	if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
-	{
-		return;
-	}
+	AActor* SourceAvatarActor =  DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (SourceAvatarActor == OtherActor) return;
 
 	//判断队伤
-	if (!UAuraAbilitySystemLibrary::IsNotFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
-	{
-		return;
-	}
+	if (!UAuraAbilitySystemLibrary::IsNotFriend(SourceAvatarActor, OtherActor)) return;
 
 	//没命中
-	if (!bHit)
-	{
-		//播放声音
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		//播放特效
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-		//停止播放移动音效
-		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
-		bHit = true;
-	}
-
-	//销毁自身
-	if (HasAuthority())
+	if (!bHit) OnHit();
+	
+	if (HasAuthority()) // 有权限
 	{
 		//对目标应用GE
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+			// 死亡击飞方向 设置为技能朝向
+			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+			DamageEffectParams.DeathImpulse = DeathImpulse;
+
+			// 攻击击退概率
+			const bool bKnockback = FMath::RandRange(1, 100) < DamageEffectParams.KnockbackChance;
+			if (bKnockback)
+			{
+				// 攻击击退方向
+				// const FVector KnockbackDirection = GetActorForwardVector().RotateAngleAxis(45.f, GetActorRightVector()); // 向上45度
+				// const FVector KnockbackForce = KnockbackDirection * DamageEffectParams.KnockbackForceMagnitude;
+				FRotator Rotation = GetActorRotation();
+				Rotation.Pitch = 45.f; // 向上45度
+				const FVector KnockbackDirection = Rotation.Vector();
+				const FVector KnockbackForce = KnockbackDirection * DamageEffectParams.KnockbackForceMagnitude;
+				DamageEffectParams.KnockbackForce = KnockbackForce;
+			}
+			
+			// 设置目标ASC
+			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
+			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 		
-		Destroy();
+		Destroy(); //销毁自身
 	}
-	else
-	{
-		bHit = true;
-	}
+	else bHit = true;
 }
 

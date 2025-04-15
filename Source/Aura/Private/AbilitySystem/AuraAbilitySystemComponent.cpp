@@ -58,11 +58,36 @@ void UAuraAbilitySystemComponent::AddCharacterPassiveAbilities(
     	}
 }
 
-//按键按下
+//按键按下时
+void UAuraAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+{
+	//标签有效性
+	if (!InputTag.IsValid()) return;
+	
+	//获取所有可激活能力
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		//匹配标签
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			//告知能力正在被按下
+			AbilitySpecInputPressed(AbilitySpec);
+			//能力处于Active则触发复制事件
+			if (AbilitySpec.IsActive())
+			{
+				//将按下事件复制到服务器和所有相关的客户端
+				InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, AbilitySpec.Handle, AbilitySpec.ActivationInfo.GetActivationPredictionKey());
+			}
+		}
+	}
+}
+
+//按键按住时
 void UAuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	//标签有效性
 	if (!InputTag.IsValid()) return;
+	
 	//获取所有可激活能力
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
@@ -80,18 +105,20 @@ void UAuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputT
 	}
 }
 
-//按键释放
+//按键释放时
 void UAuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
 {
 	//标签有效性
 	if (!InputTag.IsValid()) return;
+	
 	//遍历可激活能力列表
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		//匹配标签
-		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) && AbilitySpec.IsActive())
 		{
 			AbilitySpecInputReleased(AbilitySpec);
+			InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, AbilitySpec.Handle, AbilitySpec.ActivationInfo.GetActivationPredictionKey());
 		}
 	}
 }

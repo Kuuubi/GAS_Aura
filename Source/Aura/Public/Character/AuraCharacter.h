@@ -60,6 +60,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 
+	// 重载眩晕状态复制通知回调
+	virtual void OnRep_Stunned() override;
+	// 重载点燃状态复制通知回调
+	virtual void OnRep_Burned() override;
+
 private:
 	//相机
 	UPROPERTY(VisibleAnywhere)

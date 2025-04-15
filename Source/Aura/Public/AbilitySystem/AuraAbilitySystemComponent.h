@@ -47,9 +47,11 @@ public:
 	//角色能力是否添加完毕
 	bool bStartupAbilitiesGiven = false;
 
-	//按键释放时
-	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	//按键按下时
+	void AbilityInputTagPressed(const FGameplayTag& InputTag);
+	//按键按住时
+	void AbilityInputTagHeld(const FGameplayTag& InputTag);
+	//按键释放时
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	//遍历可激活技能
 	void ForEachAbility(const FForEachAbility& Delegate);

@@ -4,6 +4,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayAbilities/Public/GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
@@ -180,6 +181,9 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	//将数据传给Props
 	SetFEffectProperties(Data, Props);
 
+	// 如果目标角色死亡直接返回
+	if (Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.SourceCharacter)) return;
+
 	//变化后夹紧属性值
 	//最大血量
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
@@ -197,91 +201,215 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	//传入伤害元属性
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
-		const float LocalIncomingDamage = GetIncomingDamage();
-		SetIncomingDamage(0.f);
-		//伤害计算
-		if (LocalIncomingDamage > 0.f)
-		{
-			//修改血量
-			const float NewHealth = GetHealth() - LocalIncomingDamage;
-			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-
-			//致命伤害
-			const bool bFatal = NewHealth <= 0.f;
-			if (bFatal)
-			{
-				//角色死亡
-				ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
-				if (CombatInterface)
-				{
-					CombatInterface->Die();
-				}
-				//发送经验事件
-				SendXPEvent(Props);
-			}
-			else
-			{
-				{
-					//受击反应
-					//标签容器
-					FGameplayTagContainer TagContainer;
-					TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
-					//根据标签激活能力
-					Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
-				}
-				
-				//判断是否成功格挡
-				const bool bBlockHit = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
-				//判断是否成功暴击
-				const bool bCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
-				//伤害文本
-				ShowFloatingText(Props, LocalIncomingDamage, bBlockHit, bCriticalHit);
-			}
-		}
+		HandleIncomingDamage(Props);
 	}
 
 	//传入XP元属性
 	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
 	{
-		const float LocalIncomingXP = GetIncomingXP();
-		SetIncomingXP(0.f);
-		//UE_LOG(LogAura, Log, TEXT("传入XP：%f"), LocalIncomingXP);
-		
-		//如果实现玩家，战斗接口
-		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
+		HandleIncomingXP(Props);
+	}
+	
+}
+
+void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
+{
+	const float LocalIncomingDamage = GetIncomingDamage();
+	SetIncomingDamage(0.f);
+	//伤害计算
+	if (LocalIncomingDamage > 0.f && GetHealth() > 0.f)
+	{
+		//修改血量
+		const float NewHealth = GetHealth() - LocalIncomingDamage;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+		//致命伤害
+		const bool bFatal = NewHealth <= 0.f;
+		if (bFatal)
 		{
-			//获取当前等级	
-			const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(Props.SourceCharacter);
-			//获取当前XP
-			const int32 CurrentXP = IPlayerInterface::Execute_GetPlayerXP(Props.SourceCharacter);
-			
-			//通过XP查找等级
-			const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(Props.SourceCharacter, CurrentXP + LocalIncomingXP);
-			//升级次数 2级-1级=1次
-			const int32 NumOfLevelUps = NewLevel - CurrentLevel;
-			if (NumOfLevelUps > 0)
+			//角色死亡
+			ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+			if (CombatInterface)
 			{
-				//获取要奖励多少可用属性点和技能点
-				const int32 AttributePointsReward = IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel);
-				const int32 SpellPointsReward = IPlayerInterface::Execute_GetSpellPointsReward(Props.SourceCharacter, CurrentLevel);
-
-				//增加玩家等级
-				IPlayerInterface::Execute_AddToPlayerLevel(Props.SourceCharacter, NumOfLevelUps);
-				//增加可用属性点和可用技能点
-				IPlayerInterface::Execute_AddToAttributePoints(Props.SourceCharacter, AttributePointsReward);
-				IPlayerInterface::Execute_AddToSpellPoints(Props.SourceCharacter, SpellPointsReward);
-				
-				//将当前血量和蓝量回满
-				bTopOffHealth = true;
-				bTopOffMana = true;
-
-				//升级
-				IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+				FVector Impulse = UAuraAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle);
+				CombatInterface->Die(UAuraAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle));
 			}
-			
-			//增加经验
-			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
+			//发送经验事件
+			SendXPEvent(Props);
 		}
+		else
+		{
+			{
+				// 如果角色不处于被持续攻击状态
+				if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShocked(Props.TargetCharacter))
+				{
+					//受击反应
+					FGameplayTagContainer TagContainer; //标签容器
+					TagContainer.AddTag(FAuraGameplayTags::Get().Effects_HitReact);
+					//根据标签激活能力
+					Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+				}
+
+				// 应用攻击击退值
+				const FVector& KnockbackForce = UAuraAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle);
+				if (!KnockbackForce.IsNearlyZero(1.f)) // 如果击退的值不接近于0，则触发击退效果
+				{
+					Props.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
+				}
+			}
+				
+			//判断是否成功格挡
+			const bool bBlockHit = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			//判断是否成功暴击
+			const bool bCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			//伤害文本
+			ShowFloatingText(Props, LocalIncomingDamage, bBlockHit, bCriticalHit);
+				
+			// 判断Debuff是否生效
+			if (UAuraAbilitySystemLibrary::IsSuccessfulDebuff(Props.EffectContextHandle))
+			{
+				// Handle Debuff
+				Debuff(Props);
+			}
+		}
+	}
+}
+
+void UAuraAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
+{
+	const float LocalIncomingXP = GetIncomingXP();
+	SetIncomingXP(0.f);
+	//UE_LOG(LogAura, Log, TEXT("传入XP：%f"), LocalIncomingXP);
+		
+	//如果实现玩家，战斗接口
+	if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
+	{
+		//获取当前等级	
+		const int32 CurrentLevel = ICombatInterface::Execute_GetPlayerLevel(Props.SourceCharacter);
+		//获取当前XP
+		const int32 CurrentXP = IPlayerInterface::Execute_GetPlayerXP(Props.SourceCharacter);
+			
+		//通过XP查找等级
+		const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(Props.SourceCharacter, CurrentXP + LocalIncomingXP);
+		//升级次数 2级-1级=1次
+		const int32 NumOfLevelUps = NewLevel - CurrentLevel;
+		if (NumOfLevelUps > 0)
+		{
+			//获取要奖励多少可用属性点和技能点
+			const int32 AttributePointsReward = IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel);
+			const int32 SpellPointsReward = IPlayerInterface::Execute_GetSpellPointsReward(Props.SourceCharacter, CurrentLevel);
+
+			//增加玩家等级
+			IPlayerInterface::Execute_AddToPlayerLevel(Props.SourceCharacter, NumOfLevelUps);
+			//增加可用属性点和可用技能点
+			IPlayerInterface::Execute_AddToAttributePoints(Props.SourceCharacter, AttributePointsReward);
+			IPlayerInterface::Execute_AddToSpellPoints(Props.SourceCharacter, SpellPointsReward);
+
+			//将当前血量和蓝量回满
+			bTopOffHealth = true;
+			bTopOffMana = true;
+
+			//升级
+			IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+		}
+			
+		//增加经验
+		IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
+	}
+}
+
+void UAuraAttributeSet::Debuff(const FEffectProperties& Props)
+{
+	// 获取Debuff相关参数-------------------------------------------------------------------------------------------------
+	// 获取游戏标签结构体
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	// 获取伤害类型游戏标签
+	const FGameplayTag DamageType = UAuraAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	// 获取伤害
+	const float DebuffDamage = UAuraAbilitySystemLibrary::GetDebuffDamage(Props.EffectContextHandle);
+	// 获取持续时间
+	const float DebuffDuration = UAuraAbilitySystemLibrary::GetDebuffDuration(Props.EffectContextHandle);
+	// 获取频率
+	const float DebuffFrequency = UAuraAbilitySystemLibrary::GetDebuffFrequency(Props.EffectContextHandle);
+	
+	// DebuffName 以伤害类型标签命名---------------------------------------------------------------------------------------
+	FString DebuffName = FString::Printf(TEXT("DynamicDebuff_%s"), *DamageType.ToString());
+	// 创建可实例化的GE
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(DebuffName));
+
+	// 设置动态创建GE的属性------------------------------------------------------------------------------------------------
+	// 设置时间策略
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration; // 持续时间策略
+	// 设置周期
+	Effect->Period = DebuffFrequency;
+	// 设置持续时间幅度
+	Effect->DurationMagnitude = FScalableFloat(DebuffDuration);
+	// Effect->bExecutePeriodicEffectOnApplication = false; // 在应用后不会立即触发，而是在经过了Period后才会触发
+	// Effect->PeriodicInhibitionPolicy = EGameplayEffectPeriodInhibitionRemovedPolicy::NeverReset; // 设置每次应用后不会重置触发时间
+
+	// 设置堆叠样式，就是可叠加层数
+	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource; // 按源聚合
+	// 设置堆栈限制计数
+	Effect->StackLimitCount = 1;
+	
+	// Effect->StackDurationRefreshPolicy = EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication; // 在应用后重置时，重置持续时间
+	// Effect->StackPeriodResetPolicy = EGameplayEffectStackingPeriodPolicy::ResetOnSuccessfulApplication; // 在应用时，触发并重置Period时间
+	// Effect->StackExpirationPolicy = EGameplayEffectStackingExpirationPolicy::ClearEntireStack; // GE时间到了默认清除所有层数，还有可以清除单层的设置
+	// Effect->OverflowEffects.Add() // 在叠加层数超出时，将触发此数组内的GE应用到角色
+	// Effect->bDenyOverflowApplication = true; // 设置为true时，叠加层数超出时，将不会刷新GE实例
+	// Effect->bClearStackOnOverflow = true; // 设置为true时，叠加层数超出时，将清除GE
+
+	// 修饰符 可以添加多个
+	const int32 Index = Effect->Modifiers.Num(); // 获取当前修改属性的Modifiers的长度，也就是下一个添加的modify的下标索引
+	Effect->Modifiers.Add(FGameplayModifierInfo()); // 添加一个新的Modify
+	FGameplayModifierInfo& ModifierInfo = Effect->Modifiers[Index]; // 通过下标索引获取Modify
+	// 设置伤害
+	ModifierInfo.ModifierMagnitude = FScalableFloat(DebuffDamage);
+	// 设置运算符号
+	ModifierInfo.ModifierOp = EGameplayModOp::Additive; // 加
+	// 设置修改的属性
+	ModifierInfo.Attribute = UAuraAttributeSet::GetIncomingDamageAttribute();
+
+	// 赋予目标Actor Debuff标签-------------------------------------------------------------------------------------------
+	// Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.DamageTypesToDebuff[DamageType]); // 以前可以直接修改标签容器，UE5.3以后已弃用
+	// UE5.3以后需要通过GEComponent来设置GE应用的标签，向目标Actor赋予标签
+	/*
+	UTargetTagsGameplayEffectComponent& TargetTagsGameplayEffectComponent = Effect->AddComponent<UTargetTagsGameplayEffectComponent>(); 
+	FInheritedTagContainer InheritableOwnedTagsContainer = TargetTagsGameplayEffectComponent.GetConfiguredTargetTagChanges(); // 获取标签容器
+	InheritableOwnedTagsContainer.AddTag(GameplayTags.DamageTypesToDebuff[DamageType]); // 添加标签
+	TargetTagsGameplayEffectComponent.SetAndApplyTargetTagChanges(InheritableOwnedTagsContainer); // 应用并更新
+	*/
+
+	UTargetTagsGameplayEffectComponent& TargetTagsGameplayEffectComponent = Effect->AddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritableOwnedTagsContainer; // 创建组件所需的标签容器 而不是直接获取标签容器
+	const FGameplayTag DebuffTag = GameplayTags.DamageTypesToDebuff[DamageType];
+	InheritableOwnedTagsContainer.Added.AddTag(DebuffTag); // 添加标签 添加的地方需要设置到Added对象上
+
+	// 眩晕状态添加禁止输入标签
+	if (DebuffTag.MatchesTagExact(GameplayTags.Debuff_Stun))
+	{
+		InheritableOwnedTagsContainer.Added.AddTag(GameplayTags.Player_Block_CursorTrace);
+		InheritableOwnedTagsContainer.Added.AddTag(GameplayTags.Player_Block_InputHeld);
+		InheritableOwnedTagsContainer.Added.AddTag(GameplayTags.Player_Block_InputPressed);
+		InheritableOwnedTagsContainer.Added.AddTag(GameplayTags.Player_Block_InputReleased);
+	}
+	
+	TargetTagsGameplayEffectComponent.SetAndApplyTargetTagChanges(InheritableOwnedTagsContainer); // 应用并更新
+
+	// 创建GE实例--------------------------------------------------------------------------------------------------------
+	// MakeEffectContext
+	FGameplayEffectContextHandle EffectContext = Props.SourceASC->MakeEffectContext();
+	// AddSourceObject
+	EffectContext.AddSourceObject(Props.SourceAvatarActor);
+	// 创建GE实例，并添加伤害类型标签，应用GE
+	FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f);
+	if (MutableSpec)
+	{
+		FAuraGameplayEffectContext* AuraContext = static_cast<FAuraGameplayEffectContext*>(MutableSpec->GetContext().Get());
+		TSharedPtr<FGameplayTag> DebuffDamageType = MakeShareable(new FGameplayTag(DamageType));
+		AuraContext->SetDamageType(DebuffDamageType);
+		
+		Props.TargetASC->ApplyGameplayEffectSpecToSelf(*MutableSpec);
 	}
 	
 }
@@ -468,12 +596,4 @@ void UAuraAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Mana, OldMana);
 }
-
-
-
-
-
-
-
-
 
