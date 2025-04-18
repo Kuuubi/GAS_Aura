@@ -1,0 +1,31 @@
+// copyright
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "NiagaraComponent.h"
+#include "DebuffNiagaraComponent.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class AURA_API UDebuffNiagaraComponent : public UNiagaraComponent
+{
+	GENERATED_BODY()
+public:
+	UDebuffNiagaraComponent();
+
+	UPROPERTY(VisibleAnywhere)
+	FGameplayTag DebuffTag;
+
+protected:
+	virtual void BeginPlay() override;
+	// Debuff标签变化
+	void DebuffTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	// 在角色死亡时的回调
+	UFUNCTION()
+	void OnOwnerDeath(AActor* DeathActor);
+};

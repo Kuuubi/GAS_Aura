@@ -125,9 +125,14 @@ public:
 	FGameplayTag Abilities_Type_Passive;
 	FGameplayTag Abilities_Type_None;
 	
-	//技能
+	//主动技能
 	FGameplayTag Abilities_Fire_FireBolt;
 	FGameplayTag Abilities_Lightning_Electrocute;
+
+	// 被动技能
+	FGameplayTag Abilities_Passive_HaloOfProtection; // 守护光环
+	FGameplayTag Abilities_Passive_LifeSiphon; // 生命回复
+	FGameplayTag Abilities_Passive_ManaSiphon; // 蓝量回复
 
 	/*
 	* 技能冷却标签
