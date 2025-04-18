@@ -7,15 +7,18 @@
 #include "AuraAbilitySystemComponent.generated.h"
 
 //声明多播委托Tag
-DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* AssetTags*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /*AssetTags*/)
 //拥有的技能
 DECLARE_MULTICAST_DELEGATE(FAbilitiesGiven);
 DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
 //更新技能状态
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /* AbilityTag */, const FGameplayTag& /* StatusTag */, int32 /* AbilityLevel */);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*StatusTag*/, int32 /*AbilityLevel*/);
 // 装备新技能
-DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipped, const FGameplayTag& /* AbilityTag */, const FGameplayTag& /* Status */, const FGameplayTag& /* Slot */, const FGameplayTag& /* PreviousSlot */);
-
+DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipped, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*Status*/, const FGameplayTag& /*Slot*/, const FGameplayTag& /*PreviousSlot*/);
+// 结束技能激活
+DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivatePassiveAbility, const FGameplayTag& /*AbilityTag*/)
+// 被动技能激活/结束同时激活/结束被动奶瓜特效
+DECLARE_MULTICAST_DELEGATE_TwoParams(FActivePassiveEffect, const FGameplayTag& /*AbilityTag*/, bool /*bActivate*/)
 
 /**
  * 
@@ -37,6 +40,10 @@ public:
 	FAbilityStatusChanged AbilityStatusChanged;
 	// 创建更新装备的新技能标签
 	FAbilityEquipped AbilityEquipped;
+	// 结束技能激活的委托
+	FDeactivatePassiveAbility DeactivatePassiveAbility;
+	// 激活/结束被动奶瓜特效
+	FActivePassiveEffect ActivePassiveEffect;
 
 	//赋予角色主动能力
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
@@ -65,12 +72,32 @@ public:
 
 	//通过AbilityTag获取技能状态标签
 	FGameplayTag GetStatusFromAbilityTag(const FGameplayTag& AbilityTag);
-	//通过AbilityTag获取技能输入标签
-	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
+	//通过AbilityTag获取装备技能的槽位
+	FGameplayTag GetSlotFromAbilityTag(const FGameplayTag& AbilityTag);
+	
+	// 检查技能槽位是否为空
+	bool SlotIsEmpty(const FGameplayTag& Slot);
+	// 检查技能是否装备到指定槽位
+	static bool AbilityHasSlot(const FGameplayAbilitySpec& Spec, const FGameplayTag& Slot);
+	// 检查技能是否已经有槽位
+	static bool AbilityHasAnySlot(const FGameplayAbilitySpec& Spec);
+	// 获取指定技能槽位装备的AbilitySpec
+	FGameplayAbilitySpec* GetSpecWithSlot(const FGameplayTag& Slot);
+	// 检查技能是否是被动技能
+	bool IsPassiveAbility(const FGameplayAbilitySpec& AbilitySpec) const;
+	// 分配指定槽位给技能
+	static void AssignSlotToAbility(FGameplayAbilitySpec& Spec, const FGameplayTag& Slot);
+
+	/**
+ 	 * 多播被动特效委托广播，让每个客户端都可以看到特效
+ 	 * @param AbilityTag 被动技能标签
+ 	 * @param bActivate 激活或者关闭
+ 	 */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastActivatePassiveEffect(const FGameplayTag& AbilityTag, bool bActivate);
 	
 	//通过AbilityTag获取指定Spec，否则返回空指针表示不能使用该技能
 	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
-
 
 	//要增加的属性
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
@@ -91,13 +118,14 @@ public:
 	void ServerEquipAbility(const FGameplayTag& AbilityTag,const FGameplayTag& Slot);
 
 	// 客户端RPC将广播装备上的新技能的标签，状态，新插槽，旧插槽
+	UFUNCTION(Client, Reliable)
 	void ClientEquipAbility(const FGameplayTag& AbilityTag,const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot);
 
 	//根据游戏标签获取技能描述文本
 	bool GetDescriptionsByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription);
 
 	// 根据Spec删除输入标签
-	void ClearSlot(FGameplayAbilitySpec* Spec);
+	static void ClearSlot(FGameplayAbilitySpec* Spec);
 	// 清除装备技能栏插槽的技能
 	void ClearAbilitiesOfSlot(const FGameplayTag& Slot);
 	// 判断技能是否在插槽

@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UPassiveNiagaraComponent;
 class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 class UGameplayAbility;
@@ -24,6 +25,8 @@ class AURA_API AAuraCharacterBase : public ACharacter, public  IAbilitySystemInt
 
 public:
 	AAuraCharacterBase();
+
+	virtual void Tick(float DeltaTime) override;
 	
 	// 重载复制属性函数
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -231,4 +234,20 @@ private:
 	//设置受击反应蒙太奇动画
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	// 守护光环被动奶瓜特效
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionNiagaraComponent;
+
+	// 回复生命被动奶瓜特效
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> LifeSiphonNiagaraComponent;
+
+	// 回复蓝量被动奶瓜特效
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonNiagaraComponent;
+
+	// 被动特效场景组件
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> EffectAttachComponent;
 };

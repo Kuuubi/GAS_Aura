@@ -7,6 +7,7 @@
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
+#include "AbilitySystem/Passive/PassiveNiagaraComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,7 +17,7 @@
 // Sets default values
 AAuraCharacterBase::AAuraCharacterBase()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	// 初始化火焰Debuff奶瓜特效
 	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("BurnDebuffComponent");
@@ -45,6 +46,24 @@ AAuraCharacterBase::AAuraCharacterBase()
 	Weapon->SetupAttachment(GetMesh(),FName("WeaponHandSocket"));
 	//武器没有任何碰撞
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 被动特效场景组件
+	EffectAttachComponent = CreateDefaultSubobject<USceneComponent>("EffectAttachPotion");
+	EffectAttachComponent->SetupAttachment(GetRootComponent());
+	HaloOfProtectionNiagaraComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>("HaloOfProtectionComp");
+	HaloOfProtectionNiagaraComponent->SetupAttachment((EffectAttachComponent));
+	LifeSiphonNiagaraComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>("LifeSiphonComp");
+	LifeSiphonNiagaraComponent->SetupAttachment((EffectAttachComponent));
+	ManaSiphonNiagaraComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>("ManaSiphonComp");
+	ManaSiphonNiagaraComponent->SetupAttachment((EffectAttachComponent));
+}
+
+void AAuraCharacterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	// 防止特效跟随人物旋转，每一帧更新修改旋转为默认
+	EffectAttachComponent->SetWorldRotation(FRotator::ZeroRotator);
 }
 
 void AAuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
