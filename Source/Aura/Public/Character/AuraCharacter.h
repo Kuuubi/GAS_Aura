@@ -49,6 +49,10 @@ public:
 	virtual void AddToSpellPoints_Implementation(int32 InSpellPointsReward) override;
 	//升级
 	virtual void LevelUp_Implementation() override;
+	// 重载显示奥术攻击范围
+	virtual void ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial = nullptr) override;
+	// 重载隐藏奥术攻击范围
+	virtual void HideMagicCircle_Implementation(UMaterialInterface* DecalMaterial = nullptr) override;
 	/** end Player Interface */
 
 	/** Combat Interface */

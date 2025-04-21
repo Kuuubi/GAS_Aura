@@ -65,4 +65,11 @@ public:
 	//升级
 	UFUNCTION(BlueprintNativeEvent)
 	void LevelUp();
+
+	// 显示奥术攻击范围
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
+	// 隐藏奥术攻击范围
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HideMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
 };

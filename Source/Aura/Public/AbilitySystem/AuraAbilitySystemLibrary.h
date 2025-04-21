@@ -25,6 +25,12 @@ class AURA_API UAuraAbilitySystemLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 
+	
+	/*
+	 * ================================================================================================================
+	 * UI控制层
+	 */
+
 	//构造控件控制层
 	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AAuraHUD*& OutAuraHUD);
@@ -41,6 +47,11 @@ public:
 	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static USpellMenuWidgetController* GetSpellMenuWidgetController(const UObject* WorldContextObject);
 
+	/*
+	 * ================================================================================================================
+	 * 技能系统类默认值
+	 */
+	
 	//根据敌人职业和等级初始化属性
 	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | CharacterClassDefaults ")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
@@ -57,8 +68,10 @@ public:
 	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | CharacterClassDefaults ")
 	static UAbilityInfo* GetAbilityClassInfo(const UObject* WorldContextObject);
 
-	// =================================================================================================================
-	// Getter
+	/*
+	 * ================================================================================================================
+	 * Effect Context Getters
+	 */
 	
 	//判断是否成功格挡
 	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
@@ -95,8 +108,27 @@ public:
 	// 获取攻击击退方向
 	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
 	static FVector GetKnockbackForce(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	// 判断是否范围伤害
+	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static bool IsRadialDamage(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	// 获取内半径伤害距离
+	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static float GetRadialDamageInnerRadius(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	// 获取外半径伤害距离
+	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static float GetRadialDamageOuterRadius(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	// 获取伤害的中心点
+	UFUNCTION(BlueprintPure,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static FVector GetRadialDamageOrigin(const FGameplayEffectContextHandle& EffectContextHandle);
 	
-	// Setter
+	/*
+	 * ================================================================================================================
+	 * Effect Context Setters
+	 */
 	
 	//设置是否成功格挡
 	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
@@ -134,8 +166,27 @@ public:
 	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
 	static void SetKnockbackForce(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InKnockbackForce);
 
-	// =================================================================================================================
+	// 设置是否范围伤害
+	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static void SetIsRadialDamage(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool& bInIsRadialDamage);
 
+	// 设置内半径伤害距离
+	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static void SetRadialDamageInnerRadius(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const float& InRadialDamageInnerRadius);
+
+	// 设置外半径伤害距离
+	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static void SetRadialDamageOuterRadius(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const float& InRadialDamageOuterRadius);
+
+	// 设置伤害的中心点
+	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayEffects ")
+	static void SetRadialDamageOrigin(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InRadialDamageOrigin);
+	
+	/*
+	 * ================================================================================================================
+	 * 游戏机制算法
+	 */
+	
 	//获取一定半径范围内所有在线的玩家
 	UFUNCTION(BlueprintCallable,  Category="AuraAbilitySystemLibrary | GameplayMechanics ")
 	static void GetLivePlayerWithRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin);

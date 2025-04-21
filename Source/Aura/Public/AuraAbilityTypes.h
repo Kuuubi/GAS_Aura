@@ -6,7 +6,7 @@
 
 class UGameplayEffect;
 
-// Debuff伤害效果参数结构体
+// 伤害效果参数结构体
 USTRUCT(BlueprintType)
 struct FDamageEffectParams
 {
@@ -71,6 +71,22 @@ struct FDamageEffectParams
 	// 攻击击退方向
 	UPROPERTY(BlueprintReadWrite)
 	FVector KnockbackForce = FVector::ZeroVector;
+
+	// 是否为范围伤害
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsRadialDamage = false;
+
+	// 内半径伤害距离：在此半径内的所有目标都将受到完整的伤害
+	UPROPERTY(BlueprintReadWrite)
+	float RadialDamageInnerRadius = 0.f;
+
+	// 外半径伤害距离：距离伤害衰减，超出此距离外的目标将无法受到伤害
+	UPROPERTY(BlueprintReadWrite)
+	float RadialDamageOuterRadius = 0.f;
+
+	// 伤害的中心点
+	UPROPERTY(BlueprintReadWrite)
+	FVector RadialDamageOrigin = FVector::ZeroVector;
 	
 };
 
@@ -91,6 +107,10 @@ public:
 	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
 	FVector GetDeathImpulse() const { return DeathImpulse; }
 	FVector GetKnockbackForce() const { return KnockbackForce; }
+	bool GetIsRadialDamage() const { return bIsRadialDamage; }
+	float GetRadialDamageInnerRadius() const { return RadialDamageInnerRadius; }
+	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
+	FVector GetRadialDamageOrigin() const { return RadialDamageOrigin; }
 	// Setter
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
@@ -101,6 +121,10 @@ public:
 	void SetDamageType(TSharedPtr<FGameplayTag> InDamageType) { DamageType = InDamageType; }
 	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
 	void SetKnockbackForce(const FVector& InKnockbackForce) { KnockbackForce = InKnockbackForce; }
+	void SetIsRadialDamage(const bool& InIsRadialDamage) { bIsRadialDamage = InIsRadialDamage; }
+	void SetRadialDamageInnerRadius(const float& InRadialDamageInnerRadius) { RadialDamageInnerRadius = InRadialDamageInnerRadius; }
+	void SetRadialDamageOuterRadius(const float& InRadialDamageOuterRadius) { RadialDamageOuterRadius = InRadialDamageOuterRadius; }
+	void SetRadialDamageOrigin(const FVector& InRadialDamageOrigin) { RadialDamageOrigin = InRadialDamageOrigin; }
 	
 	//返回用于序列化的静态结构体
 	/** Returns the actual struct used for serialization, subclasses must override this! */
@@ -159,6 +183,22 @@ protected:
 	// 攻击击退方向
 	UPROPERTY()
 	FVector KnockbackForce = FVector::ZeroVector;
+
+	// 是否为范围伤害
+	UPROPERTY()
+	bool bIsRadialDamage = false;
+
+	// 内半径伤害距离：在此半径内的所有目标都将受到完整的伤害
+	UPROPERTY()
+	float RadialDamageInnerRadius = 0.f;
+
+	// 外半径伤害距离：距离伤害衰减，超出此距离外的目标将无法受到伤害
+	UPROPERTY()
+	float RadialDamageOuterRadius = 0.f;
+
+	// 伤害的中心点
+	UPROPERTY()
+	FVector RadialDamageOrigin = FVector::ZeroVector;
 	
 };
 

@@ -48,7 +48,7 @@ public:
 	FGameplayTag Attributes_Meta_IncomingXP;
 
 	/*
-	* 输入标签
+	* 主动技能槽位/输入标签
 	*/
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
@@ -58,7 +58,7 @@ public:
 	FGameplayTag InputTag_4;
 
 	/*
-	* 被动技能标签
+	* 被动技能槽位标签
 	*/
 	FGameplayTag InputTag_Passive_1;
 	FGameplayTag InputTag_Passive_2;
@@ -125,9 +125,11 @@ public:
 	FGameplayTag Abilities_Type_Passive;
 	FGameplayTag Abilities_Type_None;
 	
-	//主动技能
+	// 主动技能
 	FGameplayTag Abilities_Fire_FireBolt;
 	FGameplayTag Abilities_Lightning_Electrocute;
+	FGameplayTag Abilities_Arcane_ArcaneShards;
+	
 
 	// 被动技能
 	FGameplayTag Abilities_Passive_HaloOfProtection; // 守护光环
@@ -135,10 +137,11 @@ public:
 	FGameplayTag Abilities_Passive_ManaSiphon; // 蓝量回复
 
 	/*
-	* 技能冷却标签
+	* 技能CD标签
 	*/
 	FGameplayTag Cooldown_Fire_FireBolt;
 	FGameplayTag Cooldown_Lightning_Electrocute;
+	FGameplayTag Cooldown_Arcane_ArcaneShards;
 
 	/*
 	* 受击标签

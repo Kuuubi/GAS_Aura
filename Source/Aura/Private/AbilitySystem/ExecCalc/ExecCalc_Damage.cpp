@@ -10,6 +10,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 //捕获定义结构体
 struct AuraDamageStatics
@@ -174,10 +175,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	{
 		TargetPlayerLevel = ICombatInterface::Execute_GetPlayerLevel(SourceAvatar);
 	}
-	
 
+	
 	//获取Spec信息
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	//获取Context
+	FGameplayEffectContextHandle EffectContextHandle =  Spec.GetContext();
 
 	//获取标签
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -204,8 +207,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		//通过TMap传入抗性标签获取对应的捕获属性
 		const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[ResistanceTypeTag];
 
-		//从 由调用者设置 通过伤害类型标签找到对应的值
+		//从 SetByCallerMagnitude 通过伤害类型标签找到对应的值
 		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag, false, 0.f);
+
+		if (DamageTypeValue <= 0.f)
+		{
+			continue;
+		}
 		
 		//捕获抗性值
 		float Resistance = 0.f;
@@ -214,6 +222,39 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 		//抗性按百分比减少伤害
 		DamageTypeValue *= ( 100.f - Resistance ) / 100.f;
+
+		// 范围伤害
+		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			// 1. 在 AuraCharacterBase 里重载 TakeDamage
+			// 2. 在战斗接口创建 OnDamageDelegate 委托，在 TakeDamage 里广播伤害
+			// 3. 在战斗接口声明一个虚函数返回&引用，并在角色基类实现，在计算伤害时从受到受害者上通过战斗接口获取到委托，并绑定lambda
+			// 4. 调用 UGameplayStatics::ApplyRadialDamageWithFalloff 造成伤害(这将调用TakeDamage, 然后调用广播 OnDamageDelegate 委托)
+			// 5. 在lambda中，设置 DamageTypeValue
+
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetAvatar))
+			{
+				CombatInterface->GetOnDamageSignature().AddLambda([&](float DamageAmount)
+				{
+					DamageTypeValue = DamageAmount;
+				});	
+			}
+
+			// 范围伤害衰减
+			UGameplayStatics::ApplyRadialDamageWithFalloff(
+				TargetAvatar,
+				DamageTypeValue,
+				0.f, // 最小伤害为0，在伤害半径之外不会受到任何伤害
+				UAuraAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+				1.f, // 线性伤害衰减
+				UDamageType::StaticClass(),
+				TArray<AActor*>(),
+				SourceAvatar,
+				nullptr
+				);
+		}
 		
 		Damage += DamageTypeValue;
 	}
@@ -227,9 +268,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TargetBlockChance = FMath::Max<float>( 0.0f, TargetBlockChance);
 	//判断攻击是否被成功阻挡，如果阻挡成功，伤害将减半
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
-
-	//获取Context
-	FGameplayEffectContextHandle EffectContextHandle =  Spec.GetContext();
+	
 	//Context设置是否成功格挡
 	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 	

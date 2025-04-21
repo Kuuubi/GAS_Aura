@@ -6,13 +6,14 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+class AMagicCircle;
 class UNiagaraSystem;
 class UDamageTextComponent;
 struct FGameplayTag;
 class UAuraInputConfig;
 class UInputMappingContext;
 class UInputAction;
-struct  FInputActionValue;
+struct FInputActionValue;
 class IEnemyInterface;
 class UAuraAbilitySystemComponent;
 class USplineComponent;
@@ -32,6 +33,13 @@ public:
 	//显示伤害文本
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
+
+	// 显示奥术攻击范围
+	UFUNCTION(BlueprintCallable)
+	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
+	// 隐藏奥术攻击范围
+	UFUNCTION(BlueprintCallable)
+	void HideMagicCircle();
 	
 protected:
 	//重写BeginPlay
@@ -114,4 +122,15 @@ private:
 	//设置伤害文本组件类
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
+
+	// 要生成奥术攻击范围的类
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AMagicCircle> MagicCircleClass;
+
+	// 奥术攻击范围的对象
+	UPROPERTY()
+	TObjectPtr<AMagicCircle> MagicCircle;
+
+	// 奥术攻击范围跟随鼠标移动
+	void UpdateMagicCircleLocation() const;
 };

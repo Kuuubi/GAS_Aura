@@ -66,6 +66,7 @@ void UAuraAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inp
 
 	// 作用域锁
 	FScopedAbilityListLock ActiveScopedLock(*this);
+	
 	//获取所有可激活能力
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
@@ -74,7 +75,7 @@ void UAuraAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inp
 		{
 			//告知能力正在被按下
 			AbilitySpecInputPressed(AbilitySpec);
-			//能力处于Active则触发复制事件
+			//判断能力处于激活
 			if (AbilitySpec.IsActive())
 			{
 				//将按下事件复制到服务器和所有相关的客户端

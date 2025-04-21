@@ -21,9 +21,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
 
-	// 创建技能Debuff伤害效果参数结构体
+	// 创建技能伤害参数结构体
 	UFUNCTION(BlueprintPure)
-	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(
+		AActor* TargetActor = nullptr,
+		FVector InRadialDamageOrigin = FVector::ZeroVector,
+		bool bOverrideKnokbackDirection = false,
+		FVector KnockbackDirectionOverride = FVector::ZeroVector,
+		bool bOverrideDeathImpulse = false,
+		FVector DeathImpulseDirectionOverride = FVector::ZeroVector,
+		bool bOverridePitch = true,
+		float PitchOverride = 0.f) const;
 
 	// 获取技能的伤害数值
 	UFUNCTION(BlueprintPure)
@@ -69,6 +77,18 @@ protected:
 	// 攻击击退概率
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Knockback")
 	float KnockbackChance = 0.f;
+
+	// 是否为范围伤害
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RadialDamage")
+	bool bIsRadialDamage = false;
+
+	// 内半径伤害距离：在此半径内的所有目标都将受到完整的伤害
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RadialDamage")
+	float RadialDamageInnerRadius = 0.f;
+
+	// 外半径伤害距离：距离伤害衰减，超出此距离外的目标将无法受到伤害
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RadialDamage")
+	float RadialDamageOuterRadius = 0.f;
 
 	//从攻击方式数组随机获取索引
 	UFUNCTION(BlueprintPure)

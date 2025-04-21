@@ -36,6 +36,17 @@ public:
 	//GetAS
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; };
 
+	/**
+ 	 * 重载TakeDamage
+ 	 * @see https://www.unrealengine.com/blog/damage-in-ue4
+ 	 * @param DamageAmount		要施加的伤害数值
+ 	 * @param DamageEvent		描述伤害细节的结构体，支持不同类型的伤害，如普通伤害、点伤害（FPointDamageEvent）、范围伤害（FRadialDamageEvent）等。
+ 	 * @param EventInstigator	负责造成伤害的 Controller，通常是玩家或 AI 的控制器。
+ 	 * @param DamageCauser		直接造成伤害的 Actor，例如爆炸物、子弹或掉落的石头。
+ 	 * @return					返回实际应用的伤害值。这允许目标修改或减少伤害，然后将最终的值返回。
+ 	 */
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 	/** Combat Interface */
 	//获取受击反应蒙太奇动画
 	virtual  UAnimMontage* GetHitReactMontage_Implementation() override;
@@ -83,10 +94,13 @@ public:
 
 	// 获取角色是否被持续攻击状态
 	virtual bool IsBeingShocked_Implementation() override;
+
+	virtual FOnDamageSignature& GetOnDamageSignature() override;
 	/** end Combat Interface */
 
 	FOnASCRegistered OnAscRegistered;
 	FOnDeathSignature OnDeathDelegate;
+	FOnDamageSignature OnDamageDelegate;
 	
 	//多播死亡
 	UFUNCTION(NetMulticast, Reliable)

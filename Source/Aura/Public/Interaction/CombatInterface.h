@@ -6,7 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
-#include  "AbilitySystem/Data/CharacterClassInfo.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "CombatInterface.generated.h"
 
 class UNiagaraSystem;
@@ -14,6 +14,7 @@ class UAnimMontage;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*); // Actor初始化ASC完成后委托
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, AActor*, DeadActor); // Actor死亡后的委托
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDamageSignature, float /*DamageAmount*/)
 
 //攻击方式结构体
 USTRUCT(BlueprintType)
@@ -115,6 +116,12 @@ public:
 	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() = 0;
 	// 获取Actor死亡后的委托
 	virtual FOnDeathSignature& GetOnDeathDelegate() = 0;
+
+	/**
+ 	 * 获取角色受到伤害触发的委托
+ 	 * @return 委托
+ 	 */
+	virtual FOnDamageSignature& GetOnDamageSignature() = 0;
 
 	//设置为处于持续释放技能
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)

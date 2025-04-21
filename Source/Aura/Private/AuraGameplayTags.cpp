@@ -84,7 +84,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("最大法力值")
 		);
 
-	/* 输入标签 */
+	/* 主动技能槽位/输入标签 */
 	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.LMB"),
 		FString("鼠标左键")
@@ -115,7 +115,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("键盘 4")
 		);
 
-	/* 被动技能标签 */
+	/* 被动技能槽位标签 */
 	GameplayTags.InputTag_Passive_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.Passive.1"),
 		FString("被动技能1")
@@ -294,6 +294,10 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Abilities.Lightning.Electrocute"),
 		FString("闪电技能")
 		);
+	GameplayTags.Abilities_Arcane_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Arcane.ArcaneShards"),
+		FString("奥术碎片技能")
+		);
 
 	// 被动技能
 	GameplayTags.Abilities_Passive_HaloOfProtection = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -309,7 +313,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("蓝量回复")
 		);
 	
-	/* 冷却标签 */
+	/* 技能CD标签 */
 	GameplayTags.Cooldown_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Fire.FireBolt"),
 		FString("火球技能冷却")
@@ -317,6 +321,10 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Lightning_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Lightning.Electrocute"),
 		FString("闪电技能冷却")
+		);
+	GameplayTags.Cooldown_Arcane_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Arcane.ArcaneShards"),
+		FString("奥术碎片技能冷却")
 		);
 	
 	
@@ -326,7 +334,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("受到攻击")
 		);
 
-	/* 攻击部位标签 */
+	/* 发起攻击部位标签 */
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("CombatSocket.Weapon"),
 		FString("武器攻击")
