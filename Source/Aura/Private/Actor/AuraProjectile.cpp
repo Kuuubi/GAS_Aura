@@ -95,14 +95,7 @@ void AAuraProjectile::Destroyed()
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlapPrimitiveComponent, AActor* OtherActor,
                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (DamageEffectParams.SourceAbilitySystemComponent == NULL) return;
-	//防止自己打自己
-	AActor* SourceAvatarActor =  DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	if (SourceAvatarActor == OtherActor) return;
-
-	//判断队伤
-	if (!UAuraAbilitySystemLibrary::IsNotFriend(SourceAvatarActor, OtherActor)) return;
-
+	if (!IsValidOverlap(OtherActor)) return;
 	//没命中
 	if (!bHit) OnHit();
 	
@@ -137,5 +130,15 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlapPrimitiveCompo
 		Destroy(); //销毁自身
 	}
 	else bHit = true;
+}
+
+bool AAuraProjectile::IsValidOverlap(AActor* OtherActor)
+{
+	if (DamageEffectParams.SourceAbilitySystemComponent == NULL) return false;
+	AActor* SourceAvatarActor =  DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (SourceAvatarActor == OtherActor) return false; // 判断和碰撞体接触的目标是否为自身
+	if (!UAuraAbilitySystemLibrary::IsNotFriend(SourceAvatarActor, OtherActor)) return false; // 判断是否为敌人
+
+	return true;
 }
 

@@ -241,4 +241,47 @@ public:
 
 	//通过敌人等级获取经验奖励值
 	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
+
+	/*
+	 * -----------------------------------------------------------------------------------------------------------------
+	 * 伤害效果参数
+	 */
+	
+	/**
+	 * 设置伤害配置项，将其修改为具有范围伤害的配置项
+	 * @param DamageEffectParams 需要修改的配置项
+	 * @param bIsRadial 设置是否为范围伤害
+	 * @param InnerRadius 内半径
+	 * @param OutRadius 外半径
+	 * @param Origin 伤害中心点
+	 */
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | DamageEffect ")
+	static void SetIsRadialDamageEffectParams(UPARAM(ref) FDamageEffectParams& DamageEffectParams, bool bIsRadial, float InnerRadius, float OutRadius, FVector Origin);
+
+	/**
+	 * 设置伤害配置项的攻击击退方向
+	 * @param DamageEffectParams 需要修改的伤害配置项
+	 * @param KnockbackDirection 攻击时触发击退的方向
+	 * @param Magnitude 击退力度
+	 */
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | DamageEffect ")
+	static void SetKnockbackDirection(UPARAM(ref) FDamageEffectParams& DamageEffectParams, FVector KnockbackDirection, float Magnitude = 0.f);
+
+	/**
+	 * 设置伤害配置项的死亡击退的方向
+	 * @param DamageEffectParams 需要修改的伤害配置项
+	 * @param ImpulseDirection 死亡时触发击退的方向
+	 * @param Magnitude 击退力度
+	 */
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | DamageEffect ")
+	static void SetDeathImpulseDirection(UPARAM(ref) FDamageEffectParams& DamageEffectParams, FVector ImpulseDirection, float Magnitude = 0.f);
+
+	/**
+	 * 设置伤害配置应用的目标ASC
+	 * @param DamageEffectParams 需要修改的伤害配置 
+	 * @param InASC 应用目标ASC
+	 */
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | DamageEffect ")
+	static void SetEffectParamsTargetASC(UPARAM(ref) FDamageEffectParams& DamageEffectParams, UAbilitySystemComponent* InASC);
+
 };

@@ -35,28 +35,36 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void OnHit();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OnHit();
 
 	//销毁
 	virtual void Destroyed() override;
 	
 	//球体重叠回调
 	UFUNCTION()
-	void OnSphereOverlap(UPrimitiveComponent* OverlapPrimitiveComponent, AActor *OtherActor,
+	virtual void OnSphereOverlap(UPrimitiveComponent* OverlapPrimitiveComponent, AActor *OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	//球体组件
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
 
+	// 判断重叠有效性
+	bool IsValidOverlap(AActor* OtherActor);
+	
+	//是否命中
+	bool bHit = false;
+
+	//火球移动音效组件
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> LoopingSoundComponent;
 private:
 
 	//火球存在时间
 	UPROPERTY(EditAnywhere)
 	float LifeSpan = 15.f;
-
-	//是否命中
-	bool bHit = false;
 
 	//击中奶瓜特效
 	UPROPERTY(EditAnywhere)
@@ -69,8 +77,6 @@ private:
 	//火球移动音效
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> LoopingSound;;
-	//火球移动音效组件
-	UPROPERTY()
-	TObjectPtr<UAudioComponent> LoopingSoundComponent;
+
 
 };

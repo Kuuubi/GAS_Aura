@@ -127,6 +127,7 @@ public:
 	
 	// 主动技能
 	FGameplayTag Abilities_Fire_FireBolt;
+	FGameplayTag Abilities_Fire_FireBlast;
 	FGameplayTag Abilities_Lightning_Electrocute;
 	FGameplayTag Abilities_Arcane_ArcaneShards;
 	
@@ -140,6 +141,7 @@ public:
 	* 技能CD标签
 	*/
 	FGameplayTag Cooldown_Fire_FireBolt;
+	FGameplayTag Cooldown_Fire_FireBlast;
 	FGameplayTag Cooldown_Lightning_Electrocute;
 	FGameplayTag Cooldown_Arcane_ArcaneShards;
 
@@ -171,6 +173,9 @@ public:
 	FGameplayTag Player_Block_InputHeld; // 阻止按键悬停
 	FGameplayTag Player_Block_InputReleased; // 阻止键位抬起
 	FGameplayTag Player_Block_CursorTrace; // 阻止鼠标追踪
+
+	// GCN技能特效标签
+	FGameplayTag GameplayCue_FireBlast;
 
 private:
 	//静态成员变量
